@@ -17,6 +17,7 @@ import NewArrivals from './pages/NewArrivals';
 import Summer2025 from './pages/Summer2025';
 import Cart from './pages/Cart';
 import { getPageFromHash } from './utils/navigation';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -84,6 +85,7 @@ function App() {
         {renderPage()}
       </div>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 }
