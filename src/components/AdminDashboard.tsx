@@ -86,7 +86,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
           </nav>
         </div>
 
-        <div className="absolute bottom-6 left-6 right-6">
+        <div className="absolute bottom-6 left-6 right-6 w-52">
           <button
             onClick={handleLogout}
             className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
