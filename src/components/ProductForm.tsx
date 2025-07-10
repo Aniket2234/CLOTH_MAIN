@@ -43,8 +43,12 @@ const ProductForm = () => {
     { value: 'accessories', label: 'Accessories' }
   ];
 
-  const commonSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL'];
-  const commonColors = ['Black', 'White', 'Blue', 'Navy Blue', 'Light Blue', 'Red', 'Green', 'Yellow', 'Orange', 'Purple', 'Pink', 'Brown', 'Grey', 'Beige'];
+  const commonSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '4XL', '5XL', '28', '30', '32', '34', '36', '38', '40', '42'];
+  const commonColors = [
+    'Black', 'White', 'Blue', 'Navy Blue', 'Light Blue', 'Red', 'Green', 'Yellow', 
+    'Orange', 'Purple', 'Pink', 'Brown', 'Grey', 'Beige', 'Maroon', 'Teal', 'Olive', 
+    'Lime', 'Aqua', 'Silver', 'Navy', 'Fuchsia', 'Coral', 'Indigo'
+  ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;

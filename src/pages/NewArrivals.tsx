@@ -1,69 +1,23 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import ProductFilter from '../components/ProductFilter';
 import ProductGrid from '../components/ProductGrid';
 import { useProducts } from '../contexts/ProductContext';
-import { ProductFilter as FilterType } from '../types/Product';
+import { useProductFilters } from '../hooks/useProductFilters';
 import { ArrowLeft } from 'lucide-react';
 
 const NewArrivals = () => {
   const { products } = useProducts();
-  const [filteredProducts, setFilteredProducts] = useState(products.filter(p => p.isNewArrival));
-  const [activeFilters, setActiveFilters] = useState<FilterType>({
-    colors: [],
-    priceRanges: [],
-    sizes: [],
-    sleeves: []
-  });
-
   const allNewArrivals = products.filter(p => p.isNewArrival);
-
-  useEffect(() => {
-    let filtered = [...allNewArrivals];
-
-    // Filter by colors
-    if (activeFilters.colors.length > 0) {
-      filtered = filtered.filter(product =>
-        product.colors.some(color => activeFilters.colors.includes(color))
-      );
-    }
-
-    // Filter by price ranges
-    if (activeFilters.priceRanges.length > 0) {
-      filtered = filtered.filter(product => {
-        return activeFilters.priceRanges.some(range => {
-          const cleanRange = range.replace(/₹|,/g, '');
-          const [minStr, maxStr] = cleanRange.split(' - ');
-          const min = parseFloat(minStr);
-          const max = parseFloat(maxStr);
-          return product.price >= min && product.price <= max;
-        });
-      });
-    }
-
-    // Filter by sizes
-    if (activeFilters.sizes.length > 0) {
-      filtered = filtered.filter(product =>
-        product.sizes.some(size => activeFilters.sizes.includes(size))
-      );
-    }
-
-    // Filter by sleeves
-    if (activeFilters.sleeves.length > 0) {
-      filtered = filtered.filter(product => {
-        const sleeveMap: { [key: string]: string } = {
-          'Full Sleeves': 'full-sleeves',
-          'Half Sleeves': 'half-sleeves'
-        };
-        return activeFilters.sleeves.some(sleeve => 
-          product.sleeves === sleeveMap[sleeve]
-        );
-      });
-    }
-
-    setFilteredProducts(filtered);
-  }, [activeFilters, allNewArrivals]);
+  
+  const {
+    filteredProducts,
+    activeFilters,
+    setActiveFilters,
+    sortOption,
+    setSortOption,
+    resetFilters
+  } = useProductFilters({ products: allNewArrivals });
 
   const handleGoBack = () => {
     window.history.back();
@@ -103,14 +57,38 @@ const NewArrivals = () => {
             <ProductFilter 
               onFilterChange={setActiveFilters}
               activeFilters={activeFilters}
+              showSleeves={true}
             />
           </div>
           
           {/* Main Content */}
           <div className="flex-1">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">New Arrivals</h1>
-              <p className="text-gray-600">Discover the latest additions to our collection</p>
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">New Arrivals</h1>
+                <p className="text-gray-600">Discover the latest additions to our collection</p>
+              </div>
+              
+              {/* Sort Dropdown */}
+              <div className="relative">
+                <select
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                  className="appearance-none bg-white border border-gray-300 rounded-md pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
+                >
+                  <option value="default">Sort by: Default</option>
+                  <option value="price-low-high">Price: Low to High</option>
+                  <option value="price-high-low">Price: High to Low</option>
+                  <option value="newest">Newest First</option>
+                  <option value="name-a-z">Name: A to Z</option>
+                  <option value="name-z-a">Name: Z to A</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                  </svg>
+                </div>
+              </div>
             </div>
             
             {filteredProducts.length > 0 ? (
@@ -119,7 +97,7 @@ const NewArrivals = () => {
               <div className="text-center py-12">
                 <p className="text-gray-500 text-lg">No new arrival products found matching your filters.</p>
                 <button
-                  onClick={() => setActiveFilters({ colors: [], priceRanges: [], sizes: [], sleeves: [] })}
+                  onClick={resetFilters}
                   className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
                 >
                   Clear all filters
