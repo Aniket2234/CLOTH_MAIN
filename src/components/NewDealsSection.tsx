@@ -1,4 +1,5 @@
 import React from 'react';
+import { navigateToPage } from '../utils/navigation';
 
 const NewDealsSection = () => {
   const deals = [
@@ -28,6 +29,10 @@ const NewDealsSection = () => {
       buttonText: 'SHOP NOW'
     }
   ];
+
+  const handleShopNowClick = () => {
+    navigateToPage('new-arrivals');
+  };
 
   return (
     <section className="py-16 bg-white">
@@ -75,7 +80,10 @@ const NewDealsSection = () => {
                     </p>
                   )}
                   <button className="bg-white text-black px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200 text-sm">
-                    {deal.buttonText}
+                <button 
+                  onClick={handleShopNowClick}
+                  className="bg-white text-black px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200 text-sm"
+                >
                   </button>
                 </div>
               </div>
