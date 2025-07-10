@@ -42,19 +42,9 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
   // Price range state with stable initialization
   const [priceRange, setPriceRange] = useState<[number, number]>([priceInfo.minPrice, priceInfo.maxPrice]);
 
-  // Update price range only when products change significantly
+  // Update price range when products change
   useEffect(() => {
-    const newMin = priceInfo.minPrice;
-    const newMax = priceInfo.maxPrice;
-    
-    // Only update if the current range is outside the new bounds
-    setPriceRange(current => {
-      if (current[0] < newMin || current[1] > newMax || 
-          (current[0] === 0 && current[1] === 10000 && (newMin !== 0 || newMax !== 10000))) {
-        return [newMin, newMax];
-      }
-      return current;
-    });
+    setPriceRange([priceInfo.minPrice, priceInfo.maxPrice]);
   }, [priceInfo.minPrice, priceInfo.maxPrice]);
 
   // Generate price ranges - stable memoization
@@ -146,7 +136,7 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
       });
     }
 
-    // Price range filter (slider)
+    // Price range filter (slider) - only apply if range is different from min/max
     const isCustomRange = priceRange[0] !== priceInfo.minPrice || priceRange[1] !== priceInfo.maxPrice;
     if (isCustomRange) {
       result = result.filter(product => 
@@ -205,7 +195,9 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
         ? prev.filter(c => c !== color)
         : [...prev, color]
     );
-  }, []);
+    // Reset price range slider when using checkbox filters
+    setPriceRange([priceInfo.minPrice, priceInfo.maxPrice]);
+  }, [priceInfo.minPrice, priceInfo.maxPrice]);
 
   const handleSizeToggle = useCallback((size: string) => {
     setSelectedSizes(prev =>
@@ -213,7 +205,9 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
         ? prev.filter(s => s !== size)
         : [...prev, size]
     );
-  }, []);
+    // Reset price range slider when using checkbox filters
+    setPriceRange([priceInfo.minPrice, priceInfo.maxPrice]);
+  }, [priceInfo.minPrice, priceInfo.maxPrice]);
 
   const handleSleevesToggle = useCallback((sleeveType: string) => {
     setSelectedSleeves(prev =>
@@ -221,7 +215,9 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
         ? prev.filter(s => s !== sleeveType)
         : [...prev, sleeveType]
     );
-  }, []);
+    // Reset price range slider when using checkbox filters
+    setPriceRange([priceInfo.minPrice, priceInfo.maxPrice]);
+  }, [priceInfo.minPrice, priceInfo.maxPrice]);
 
   const handlePriceRangeToggle = useCallback((rangeLabel: string) => {
     setSelectedPriceRanges(prev =>
@@ -229,10 +225,14 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
         ? prev.filter(r => r !== rangeLabel)
         : [...prev, rangeLabel]
     );
-  }, []);
+    // Reset price range slider when using checkbox filters
+    setPriceRange([priceInfo.minPrice, priceInfo.maxPrice]);
+  }, [priceInfo.minPrice, priceInfo.maxPrice]);
 
   const handlePriceRangeChange = useCallback((range: [number, number]) => {
     setPriceRange(range);
+    // Clear checkbox price ranges when using slider
+    setSelectedPriceRanges([]);
   }, []);
 
   const removeFilter = useCallback((type: string, value: string) => {
@@ -250,7 +250,9 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
         setSelectedPriceRanges(prev => prev.filter(r => r !== value));
         break;
     }
-  }, []);
+    // Reset price range slider when removing any filter
+    setPriceRange([priceInfo.minPrice, priceInfo.maxPrice]);
+  }, [priceInfo.minPrice, priceInfo.maxPrice]);
 
   const resetFilters = useCallback(() => {
     setSelectedColors([]);
