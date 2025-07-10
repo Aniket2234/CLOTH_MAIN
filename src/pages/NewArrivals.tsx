@@ -211,11 +211,11 @@ const NewArrivals = () => {
                   >
                     <div className="aspect-[5.5/6.5] bg-gray-100 mb-2 overflow-hidden rounded-md relative">
                       {/* New Arrival Badge */}
-                      {product.isNewArrival && (
-                        <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute top-3 left-3 z-10">
+                        <span className="bg-red-600 text-white px-2 py-1 text-xs font-bold rounded">
                           NEW ARRIVAL
-                        </div>
-                      )}
+                        </span>
+                      </div>
                       
                       {/* Favorite Button */}
                       <button

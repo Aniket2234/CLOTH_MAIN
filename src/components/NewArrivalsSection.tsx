@@ -70,6 +70,15 @@ const NewArrivalsSection = () => {
               className="group cursor-pointer"
             >
               <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-[3/4]">
+                {/* New Arrival Badge */}
+                {product.isNewArrival && (
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className="bg-red-600 text-white px-2 py-1 text-xs font-bold rounded">
+                      NEW ARRIVAL
+                    </span>
+                  </div>
+                )}
+                
                 <button className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors duration-200">
                   <Heart className="w-4 h-4 text-gray-600" />
                 </button>

@@ -36,7 +36,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
             {/* New Arrival Badge */}
             {product.isNewArrival && (
               <div className="absolute top-3 left-3 z-10">
-                <span className="bg-black text-white px-2 py-1 text-xs font-bold rounded">
+                <span className="bg-red-600 text-white px-2 py-1 text-xs font-bold rounded">
                   NEW ARRIVAL
                 </span>
               </div>
