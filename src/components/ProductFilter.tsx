@@ -191,7 +191,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
 
         {/* Price Filter with Slider */}
         <div className="mb-6">
-          <h3 className="font-medium mb-2">PRICE RANGE</h3>
+          <h3 className="font-medium mb-3">PRICE RANGE</h3>
           
           {/* Price Range Slider */}
           <PriceRangeSlider
@@ -205,7 +205,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
           {/* Predefined Price Ranges */}
           <div className="mt-4">
             <h4 className="text-sm font-medium text-gray-700 mb-2">Quick Select</h4>
-            <div className="space-y-1">
+            <div className="space-y-1 max-h-32 overflow-y-auto">
               {filterOptions.priceRanges.map(range => (
                 <div key={range.label} className="flex items-center">
                   <input

@@ -28,29 +28,8 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
   const [sortOption, setSortOption] = useState<string>('default');
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
 
-  // Generate dynamic filter options based on products
-  const filterOptions: FilterOptions = {
-    colors: ['Brown', 'Blue', 'Navy Blue', 'Light Blue', 'Black', 'Orange', 'Yellow',
-      'Red', 'Green', 'Purple', 'Pink', 'Gray', 'Maroon', 'Teal', 'Olive',
-      'Lime', 'Aqua', 'Silver', 'Navy', 'Fuchsia', 'Coral', 'Indigo', 'White'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '28', '30', '32', '34', '36', '38', '40', '42'],
-    sleeves: ['Full Sleeves', 'Half Sleeves', 'Sleeveless'],
-    priceRanges: generatePriceRanges(products),
-    minPrice: Math.min(...products.map(p => p.price), 0),
-    maxPrice: Math.max(...products.map(p => p.price), 10000)
-  };
-
-  // Initialize price range based on products
-  useEffect(() => {
-    if (products.length > 0) {
-      const minPrice = Math.min(...products.map(p => p.price));
-      const maxPrice = Math.max(...products.map(p => p.price));
-      setPriceRange([minPrice, maxPrice]);
-    }
-  }, [products]);
-
   // Generate dynamic price ranges based on product prices
-  function generatePriceRanges(products: Product[]) {
+  const generatePriceRanges = (products: Product[]) => {
     if (products.length === 0) {
       return [
         { min: 0, max: 999, label: '₹0 - ₹999' },
@@ -62,12 +41,12 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
     }
 
     const prices = products.map(p => p.price).sort((a, b) => a - b);
-    const minPrice = prices[0];
-    const maxPrice = prices[prices.length - 1];
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
     
     const ranges = [];
     
-    // Create ranges based on price distribution
+    // Create standard ranges
     if (minPrice < 500) {
       ranges.push({ min: 0, max: 499, label: '₹0 - ₹499' });
     }
@@ -90,17 +69,45 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
       ranges.push({ min: 8000, max: 14999, label: '₹8000 - ₹14999' });
     }
     if (maxPrice >= 15000) {
-      ranges.push({ min: 15000, max: Infinity, label: '₹15000 & Above' });
+      ranges.push({ min: 15000, max: 24999, label: '₹15000 - ₹24999' });
+    }
+    if (maxPrice >= 25000) {
+      ranges.push({ min: 25000, max: 49999, label: '₹25000 - ₹49999' });
     }
     
-    // Always include an "& Above" option for the highest range
-    const highestRange = Math.ceil(maxPrice / 1000) * 1000;
-    if (highestRange > 15000) {
-      ranges.push({ min: highestRange, max: Infinity, label: `₹${highestRange.toLocaleString()} & Above` });
+    // Always add an "& Above" option for the highest price range
+    const highestRangeStart = Math.max(5000, Math.ceil(maxPrice / 5000) * 5000);
+    if (maxPrice >= 5000) {
+      ranges.push({ 
+        min: highestRangeStart, 
+        max: Infinity, 
+        label: `₹${highestRangeStart.toLocaleString()} & Above` 
+      });
     }
 
     return ranges;
-  }
+  };
+
+  // Generate dynamic filter options based on products
+  const filterOptions: FilterOptions = {
+    colors: ['Brown', 'Blue', 'Navy Blue', 'Light Blue', 'Black', 'Orange', 'Yellow',
+      'Red', 'Green', 'Purple', 'Pink', 'Gray', 'Maroon', 'Teal', 'Olive',
+      'Lime', 'Aqua', 'Silver', 'Navy', 'Fuchsia', 'Coral', 'Indigo', 'White'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '28', '30', '32', '34', '36', '38', '40', '42'],
+    sleeves: ['Full Sleeves', 'Half Sleeves', 'Sleeveless'],
+    priceRanges: generatePriceRanges(products),
+    minPrice: products.length > 0 ? Math.min(...products.map(p => p.price)) : 0,
+    maxPrice: products.length > 0 ? Math.max(...products.map(p => p.price)) : 10000
+  };
+
+  // Initialize price range based on products
+  useEffect(() => {
+    if (products.length > 0) {
+      const minPrice = Math.min(...products.map(p => p.price));
+      const maxPrice = Math.max(...products.map(p => p.price));
+      setPriceRange([minPrice, maxPrice]);
+    }
+  }, [products]);
 
   // Apply filters and sorting
   useEffect(() => {
@@ -134,10 +141,15 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
       });
     }
 
-    // Price range filter (slider)
-    result = result.filter(product => 
-      product.price >= priceRange[0] && product.price <= priceRange[1]
-    );
+    // Price range filter (slider) - only apply if range is different from min/max
+    const productMinPrice = products.length > 0 ? Math.min(...products.map(p => p.price)) : 0;
+    const productMaxPrice = products.length > 0 ? Math.max(...products.map(p => p.price)) : 10000;
+    
+    if (priceRange[0] !== productMinPrice || priceRange[1] !== productMaxPrice) {
+      result = result.filter(product => 
+        product.price >= priceRange[0] && product.price <= priceRange[1]
+      );
+    }
 
     // Price range filter (predefined ranges)
     if (selectedPriceRanges.length > 0) {
@@ -177,7 +189,8 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
     selectedPriceRanges,
     priceRange,
     sortOption,
-    products
+    products,
+    filterOptions.priceRanges
   ]);
 
   const handleColorToggle = (color: string) => {
