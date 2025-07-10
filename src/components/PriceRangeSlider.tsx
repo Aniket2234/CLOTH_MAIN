@@ -18,6 +18,10 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
   const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
 
+  // Calculate dynamic step based on range
+  const dynamicStep = Math.max(1, Math.floor((max - min) / 20));
+  const actualStep = step < dynamicStep ? dynamicStep : step;
+
   const getPercentage = useCallback((val: number) => {
     if (max === min) return 0;
     return Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
@@ -29,9 +33,9 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
   }, [min, max]);
 
   const snapToStep = useCallback((val: number) => {
-    const snapped = Math.round(val / step) * step;
+    const snapped = Math.round(val / actualStep) * actualStep;
     return Math.max(min, Math.min(max, snapped));
-  }, [step, min, max]);
+  }, [actualStep, min, max]);
 
   const updateValueFromPosition = useCallback((clientX: number, handleType: 'min' | 'max', shouldSnap = false) => {
     if (!sliderRef.current) return;
@@ -45,19 +49,21 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
     let newRange: [number, number];
 
     if (handleType === 'min') {
-      // Ensure min doesn't exceed max minus one step
-      newValue = Math.min(newValue, value[1] - step);
+      // Ensure min doesn't exceed max minus minimum gap
+      const minGap = Math.max(actualStep, (max - min) * 0.05); // 5% of range or step, whichever is larger
+      newValue = Math.min(newValue, value[1] - minGap);
       newValue = Math.max(min, newValue);
       newRange = [newValue, value[1]];
     } else {
-      // Ensure max doesn't go below min plus one step
-      newValue = Math.max(newValue, value[0] + step);
+      // Ensure max doesn't go below min plus minimum gap
+      const minGap = Math.max(actualStep, (max - min) * 0.05);
+      newValue = Math.max(newValue, value[0] + minGap);
       newValue = Math.min(max, newValue);
       newRange = [value[0], newValue];
     }
 
     onChange(newRange);
-  }, [value, min, max, step, onChange, getValueFromPercentage, snapToStep]);
+  }, [value, min, max, actualStep, onChange, getValueFromPercentage, snapToStep]);
 
   const handleMouseDown = (type: 'min' | 'max') => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -130,10 +136,12 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
     const snappedValue = snapToStep(clickValue);
     
     let newRange: [number, number];
+    const minGap = Math.max(actualStep, (max - min) * 0.05);
+    
     if (handleType === 'min') {
-      newRange = [Math.min(snappedValue, value[1] - step), value[1]];
+      newRange = [Math.min(snappedValue, value[1] - minGap), value[1]];
     } else {
-      newRange = [value[0], Math.max(snappedValue, value[0] + step)];
+      newRange = [value[0], Math.max(snappedValue, value[0] + minGap)];
     }
 
     onChange(newRange);
@@ -160,7 +168,7 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
             className="absolute h-2 bg-black rounded-full pointer-events-none"
             style={{
               left: `${minPercentage}%`,
-              width: `${maxPercentage - minPercentage}%`
+              width: `${Math.max(0, maxPercentage - minPercentage)}%`
             }}
           />
           

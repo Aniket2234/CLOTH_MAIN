@@ -199,7 +199,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
             max={filterOptions.maxPrice}
             value={priceRange}
             onChange={onPriceRangeChange}
-            step={100}
+            step={Math.max(10, Math.floor((filterOptions.maxPrice - filterOptions.minPrice) / 10))}
           />
           
           {/* Predefined Price Ranges */}

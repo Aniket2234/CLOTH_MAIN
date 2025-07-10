@@ -89,8 +89,13 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
       });
     }
 
-    return ranges;
-  }, [priceInfo]);
+  const dynamicStep = useMemo(() => {
+    const range = priceInfo.maxPrice - priceInfo.minPrice;
+    if (range <= 200) return 10; // For small ranges like 699-799
+    if (range <= 500) return 25;
+    if (range <= 1000) return 50;
+    return Math.max(50, Math.floor(range / 20));
+  }, [priceInfo.minPrice, priceInfo.maxPrice]);
 
   // Filter options - stable object
   const filterOptions: FilterOptions = useMemo(() => ({
