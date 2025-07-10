@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useProducts } from '../contexts/ProductContext';
 import { Upload, X } from 'lucide-react';
 import { Product } from '../types/Product';
+import CustomAlert from './CustomAlert';
 
 const ProductForm = () => {
   const { addProduct, loading } = useProducts();
@@ -22,6 +23,17 @@ const ProductForm = () => {
   const [newSize, setNewSize] = useState('');
   const [newColor, setNewColor] = useState('');
   const [success, setSuccess] = useState(false);
+  const [alert, setAlert] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
 
   const categories = [
     { value: 't-shirts', label: 'T-Shirts' },
@@ -80,7 +92,12 @@ const ProductForm = () => {
     e.preventDefault();
     
     if (!formData.name || !formData.price || !formData.image || formData.sizes.length === 0 || formData.colors.length === 0) {
-      alert('Please fill in all required fields');
+      setAlert({
+        isOpen: true,
+        title: 'Missing Information',
+        message: 'Please fill in all required fields including name, price, image, sizes, and colors.',
+        type: 'warning'
+      });
       return;
     }
 
@@ -121,7 +138,12 @@ const ProductForm = () => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       console.error('Error adding product:', error);
-      alert('Error adding product. Please try again.');
+      setAlert({
+        isOpen: true,
+        title: 'Error',
+        message: 'Error adding product. Please try again.',
+        type: 'error'
+      });
     }
   };
 
@@ -383,6 +405,14 @@ const ProductForm = () => {
           </button>
         </div>
       </form>
+      
+      <CustomAlert
+        isOpen={alert.isOpen}
+        onClose={() => setAlert(prev => ({ ...prev, isOpen: false }))}
+        title={alert.title}
+        message={alert.message}
+        type={alert.type}
+      />
     </div>
   );
 };

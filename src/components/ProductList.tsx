@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
 import { useProducts } from '../contexts/ProductContext';
 import { Edit, Trash2, Eye } from 'lucide-react';
+import CustomAlert from './CustomAlert';
+import ProductViewModal from './ProductViewModal';
+import ProductEditModal from './ProductEditModal';
 
 const ProductList = () => {
   const { products, deleteProduct, loading } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [viewProduct, setViewProduct] = useState<any>(null);
+  const [editProduct, setEditProduct] = useState<any>(null);
+  const [deleteAlert, setDeleteAlert] = useState<{
+    isOpen: boolean;
+    productId: string;
+    productName: string;
+  }>({
+    isOpen: false,
+    productId: '',
+    productName: ''
+  });
 
   const categories = [
     { value: 'all', label: 'All Products' },
@@ -19,10 +33,29 @@ const ProductList = () => {
     ? products 
     : products.filter(product => product.category === selectedCategory);
 
-  const handleDelete = async (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
-      await deleteProduct(id);
-    }
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteAlert({
+      isOpen: true,
+      productId: id,
+      productName: name
+    });
+  };
+
+  const handleDeleteConfirm = async () => {
+    await deleteProduct(deleteAlert.productId);
+    setDeleteAlert({
+      isOpen: false,
+      productId: '',
+      productName: ''
+    });
+  };
+
+  const handleView = (product: any) => {
+    setViewProduct(product);
+  };
+
+  const handleEdit = (product: any) => {
+    setEditProduct(product);
   };
 
   return (
@@ -112,15 +145,24 @@ const ProductList = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex items-center space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900">
+                    <button 
+                      onClick={() => handleView(product)}
+                      className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                      title="View Product"
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="text-indigo-600 hover:text-indigo-900">
+                    <button 
+                      onClick={() => handleEdit(product)}
+                      className="text-indigo-600 hover:text-indigo-900 transition-colors duration-200"
+                      title="Edit Product"
+                    >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(product._id!, product.name)}
-                      className="text-red-600 hover:text-red-900"
+                      onClick={() => handleDeleteClick(product._id!, product.name)}
+                      className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                      title="Delete Product"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -136,6 +178,39 @@ const ProductList = () => {
         <div className="p-8 text-center">
           <p className="text-gray-500">No products found in this category.</p>
         </div>
+      )}
+      
+      {/* Delete Confirmation Alert */}
+      <CustomAlert
+        isOpen={deleteAlert.isOpen}
+        onClose={() => setDeleteAlert(prev => ({ ...prev, isOpen: false }))}
+        title="Delete Product"
+        message={`Are you sure you want to delete "${deleteAlert.productName}"? This action cannot be undone.`}
+        type="warning"
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteAlert(prev => ({ ...prev, isOpen: false }))}
+      />
+      
+      {/* View Product Modal */}
+      {viewProduct && (
+        <ProductViewModal
+          product={viewProduct}
+          onClose={() => setViewProduct(null)}
+        />
+      )}
+      
+      {/* Edit Product Modal */}
+      {editProduct && (
+        <ProductEditModal
+          product={editProduct}
+          onClose={() => setEditProduct(null)}
+          onSave={() => {
+            setEditProduct(null);
+            // Refresh will happen automatically due to context
+          }}
+        />
       )}
     </div>
   );
