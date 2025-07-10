@@ -85,6 +85,7 @@ function App() {
     <AuthProvider>
       <ProductProvider>
         <div className="min-h-screen flex flex-col">
+          {/* Admin Button - Fixed position, always visible */}
           <AdminButton />
           <div className="flex-1">
             {renderPage()}
