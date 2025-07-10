@@ -79,11 +79,11 @@ const NewDealsSection = () => {
                       {deal.description}
                     </p>
                   )}
-                  <button className="bg-white text-black px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200 text-sm">
-                <button 
-                  onClick={handleShopNowClick}
-                  className="bg-white text-black px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200 text-sm"
-                >
+                  <button 
+                    onClick={handleShopNowClick}
+                    className="bg-white text-black px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200 text-sm"
+                  >
+                    {deal.buttonText}
                   </button>
                 </div>
               </div>
