@@ -8,7 +8,7 @@ const NewDealsSection = () => {
       subtitle: 'UP TO 60% OFF',
       price: '₹699',
       label: 'EVERYTHING UNDER',
-      image: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
+      image: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
       buttonText: 'SHOP NOW'
     },
     {
@@ -16,7 +16,7 @@ const NewDealsSection = () => {
       title: 'hello',
       subtitle: 'SUMMER',
       description: 'MUST HAVE FOR HOT DAYS',
-      image: 'https://images.pexels.com/photos/1300402/pexels-photo-1300402.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
+      image: 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
       buttonText: 'SHOP NOW'
     },
     {
@@ -24,7 +24,7 @@ const NewDealsSection = () => {
       title: 'Our',
       subtitle: 'EXPERTEES',
       description: 'HITTING EVERY VIBE',
-      image: 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
+      image: 'https://images.pexels.com/photos/1300402/pexels-photo-1300402.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
       buttonText: 'SHOP NOW'
     }
   ];

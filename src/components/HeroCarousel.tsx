@@ -7,7 +7,7 @@ const HeroCarousel = () => {
   const slides = [
     {
       id: 1,
-      image: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+      image: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
       title: 'Trendy & Youthful',
       description: 'T-Shirts That Speak Your Style',
       buttonText: 'Shop Now',
@@ -15,7 +15,7 @@ const HeroCarousel = () => {
     },
     {
       id: 2,
-      image: 'https://images.pexels.com/photos/1300402/pexels-photo-1300402.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+      image: 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
       title: 'Elevate Your Everyday Style',
       description: 'Discover premium men\'s shirts tailored for comfort, class, and confidence — perfect for work, weekends, and everything in between',
       buttonText: 'Shop Now',
@@ -23,7 +23,7 @@ const HeroCarousel = () => {
     },
     {
       id: 3,
-      image: 'https://images.pexels.com/photos/2043590/pexels-photo-2043590.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+      image: 'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
       title: 'Modern Sophistication',
       description: 'Jackets & Outerwear for the Contemporary Man',
       buttonText: 'Explore Collection',
