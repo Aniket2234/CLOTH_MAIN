@@ -23,7 +23,7 @@ const AppPromotion = () => {
             <div className="flex-shrink-0 px-4">
               <div className="relative">
                 <img
-                  src="https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=300&h=600&fit=crop"
+                  src="https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=300&h=600&fit=crop"
                   alt="Phone mockup"
                   className="w-48 h-96 object-cover rounded-3xl shadow-2xl"
                 />

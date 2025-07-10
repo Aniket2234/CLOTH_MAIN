@@ -57,7 +57,7 @@ const EmpowerSection = () => {
           {/* Center Image */}
           <div className="flex-shrink-0 relative">
             <img
-              src="https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop"
+              src="https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop"
               alt="Fashion model"
               className="w-full max-w-md h-[400px] object-cover"
             />
