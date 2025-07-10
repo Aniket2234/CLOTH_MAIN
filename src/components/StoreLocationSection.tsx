@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Phone, Clock, Mail, Navigation, ExternalLink } from 'lucide-react';
+import { MapPin, Phone, Clock, Mail, Navigation, ExternalLink, Map } from 'lucide-react';
 
 const StoreLocationSection = () => {
   const storeDetails = {
@@ -29,8 +29,9 @@ const StoreLocationSection = () => {
     window.open(`https://www.google.com/maps/search/?api=1&query=${storeDetails.coordinates.lat},${storeDetails.coordinates.lng}`, '_blank');
   };
 
-  // OpenStreetMap embed URL - this always works without API keys
-  const osmMapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${storeDetails.coordinates.lng-0.01},${storeDetails.coordinates.lat-0.01},${storeDetails.coordinates.lng+0.01},${storeDetails.coordinates.lat+0.01}&layer=mapnik&marker=${storeDetails.coordinates.lat},${storeDetails.coordinates.lng}`;
+  const handleViewMap = () => {
+    window.open(`https://www.google.com/maps/@${storeDetails.coordinates.lat},${storeDetails.coordinates.lng},17z`, '_blank');
+  };
 
   return (
     <section className="py-8 bg-gray-50">
@@ -41,39 +42,54 @@ const StoreLocationSection = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-          {/* Interactive Map */}
+          {/* Interactive Map Area */}
           <div className="relative bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="aspect-video relative">
-              {/* OpenStreetMap Embed */}
-              <iframe
-                src={osmMapUrl}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                title="Nikzone Mens Beautiq Location"
-                className="rounded-lg"
-                loading="lazy"
-              />
-              
-              {/* Map Overlay with Store Info */}
-              <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-3 max-w-xs">
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <h4 className="font-semibold text-sm text-gray-900">Nikzone Mens Beautiq</h4>
+            <div className="aspect-video relative bg-gradient-to-br from-blue-50 to-green-50">
+              {/* Map Placeholder with Store Location Visual */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="relative inline-block mb-4">
+                    <div className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                      <MapPin className="w-12 h-12 text-white" />
+                    </div>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">Nikzone Mens Beautiq</h3>
+                  <p className="text-sm text-gray-600 mb-4">Kalpataru Complex, Nashik</p>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+                    <Map className="w-4 h-4" />
+                    <span>Click below to view live map</span>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-600">Kalpataru Complex, Nashik</p>
+              </div>
+              
+              {/* Decorative Map Grid */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="grid grid-cols-8 grid-rows-6 h-full">
+                  {Array.from({ length: 48 }).map((_, i) => (
+                    <div key={i} className="border border-gray-300"></div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Store Location Indicator */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-4 h-4 bg-red-500 rounded-full animate-ping"></div>
+                <div className="absolute top-0 left-0 w-4 h-4 bg-red-600 rounded-full"></div>
               </div>
             </div>
             
             {/* Map Action Buttons */}
             <div className="absolute bottom-4 right-4 flex space-x-2">
               <button
-                onClick={handleOpenInMaps}
+                onClick={handleViewMap}
                 className="bg-white text-gray-700 px-3 py-2 rounded-full text-sm font-medium hover:bg-gray-50 transition-all duration-200 flex items-center space-x-1 shadow-lg border border-gray-200"
-                title="Open in Google Maps"
+                title="View Live Map"
               >
-                <ExternalLink className="w-4 h-4" />
-                <span className="hidden sm:inline">View Larger</span>
+                <Map className="w-4 h-4" />
+                <span className="hidden sm:inline">Live Map</span>
               </button>
               <button
                 onClick={handleGetDirections}
@@ -83,6 +99,19 @@ const StoreLocationSection = () => {
                 <span>Directions</span>
               </button>
             </div>
+            
+            {/* Click to Open Map Overlay */}
+            <button
+              onClick={handleViewMap}
+              className="absolute inset-0 w-full h-full bg-transparent hover:bg-black hover:bg-opacity-5 transition-all duration-200 flex items-center justify-center group"
+            >
+              <div className="bg-black bg-opacity-0 group-hover:bg-opacity-80 text-white px-6 py-3 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100">
+                <div className="flex items-center space-x-2">
+                  <Map className="w-5 h-5" />
+                  <span className="font-medium">Open Live Map</span>
+                </div>
+              </div>
+            </button>
           </div>
           
           {/* Store Information */}
@@ -169,6 +198,13 @@ const StoreLocationSection = () => {
             {/* Quick Actions */}
             <div className="mt-4 flex gap-2">
               <button
+                onClick={handleViewMap}
+                className="flex-1 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors duration-200 flex items-center justify-center space-x-2"
+              >
+                <Map className="w-4 h-4" />
+                <span>View Live Map</span>
+              </button>
+              <button
                 onClick={handleOpenInMaps}
                 className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center space-x-2"
               >
@@ -187,16 +223,43 @@ const StoreLocationSection = () => {
           </div>
         </div>
         
-        {/* Additional Map Info */}
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
-            Can't see the map? <button 
-              onClick={handleOpenInMaps}
-              className="text-blue-600 hover:text-blue-800 underline font-medium"
+        {/* Map Access Options */}
+        <div className="mt-6 bg-white rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">Find Us Easily</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              onClick={handleViewMap}
+              className="flex items-center justify-center space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200 group"
             >
-              Click here to open in Google Maps
+              <Map className="w-6 h-6 text-blue-600 group-hover:scale-110 transition-transform duration-200" />
+              <div className="text-left">
+                <div className="font-semibold text-blue-900">View Live Map</div>
+                <div className="text-sm text-blue-600">Interactive Google Maps</div>
+              </div>
             </button>
-          </p>
+            
+            <button
+              onClick={handleGetDirections}
+              className="flex items-center justify-center space-x-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-200 group"
+            >
+              <Navigation className="w-6 h-6 text-green-600 group-hover:scale-110 transition-transform duration-200" />
+              <div className="text-left">
+                <div className="font-semibold text-green-900">Get Directions</div>
+                <div className="text-sm text-green-600">Turn-by-turn navigation</div>
+              </div>
+            </button>
+            
+            <button
+              onClick={handleCallStore}
+              className="flex items-center justify-center space-x-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-200 group"
+            >
+              <Phone className="w-6 h-6 text-purple-600 group-hover:scale-110 transition-transform duration-200" />
+              <div className="text-left">
+                <div className="font-semibold text-purple-900">Call Store</div>
+                <div className="text-sm text-purple-600">Speak with our team</div>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </section>
