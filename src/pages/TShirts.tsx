@@ -5,14 +5,11 @@ import Breadcrumb from '../components/Breadcrumb';
 import { ArrowLeft, X, Heart, Star } from 'lucide-react';
 import { useProducts } from '../contexts/ProductContext';
 import { useProductFilters } from '../hooks/useProductFilters';
-import ProductDetailModal from '../components/ProductDetailModal';
-import { useProductModal } from '../hooks/useProductModal';
 
 const TShirts = () => {
   const { getProductsByCategory } = useProducts();
   const allProducts = getProductsByCategory('t-shirts');
   const [favorites, setFavorites] = useState<string[]>([]);
-  const { selectedProduct, openProductModal, closeProductModal } = useProductModal();
 
 
   const {
@@ -57,6 +54,10 @@ const TShirts = () => {
         }`}
       />
     ));
+  };
+
+  const handleProductClick = (product: any) => {
+    window.location.hash = `#/product/${product._id}`;
   };
 
   const breadcrumbItems = [
@@ -209,7 +210,7 @@ const TShirts = () => {
                     className="group relative"
                     onMouseEnter={() => setHoveredProduct(product._id!)}
                     onMouseLeave={() => setHoveredProduct(null)}
-                    onClick={() => openProductModal(product)}
+                    onClick={() => handleProductClick(product)}
                   >
                     <div className="aspect-[5.5/6.5] bg-gray-100 mb-2 overflow-hidden rounded-md relative">
                       {/* New Arrival Badge */}
@@ -277,13 +278,6 @@ const TShirts = () => {
             )}
           </div>
           
-          {/* Product Detail Modal */}
-          {selectedProduct && (
-            <ProductDetailModal
-              product={selectedProduct}
-              onClose={closeProductModal}
-            />
-          )}
         </div>
       </div>
     </div>

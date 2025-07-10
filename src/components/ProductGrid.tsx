@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Heart, Star } from 'lucide-react';
 import { Product } from '../types/Product';
-import ProductDetailModal from './ProductDetailModal';
-import { useProductModal } from '../hooks/useProductModal';
 
 interface ProductGridProps {
   products: Product[];
@@ -10,7 +8,6 @@ interface ProductGridProps {
 
 const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
   const [favorites, setFavorites] = useState<string[]>([]);
-  const { selectedProduct, openProductModal, closeProductModal } = useProductModal();
 
   const toggleFavorite = (productId: string) => {
     setFavorites(prev => 
@@ -31,14 +28,17 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
     ));
   };
 
+  const handleProductClick = (product: Product) => {
+    window.location.hash = `#/product/${product._id}`;
+  };
+
   return (
-    <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products.map((product) => (
           <div key={product._id} className="group cursor-pointer">
             <div 
               className="relative overflow-hidden rounded-lg bg-gray-100 aspect-[3/4]"
-              onClick={() => openProductModal(product)}
+              onClick={() => handleProductClick(product)}
             >
               {/* New Arrival Badge */}
               {product.isNewArrival && (
@@ -74,7 +74,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
             </div>
             
-            <div className="mt-4" onClick={() => openProductModal(product)}>
+            <div className="mt-4" onClick={() => handleProductClick(product)}>
               {/* Rating */}
               {product.rating && (
                 <div className="flex items-center space-x-1 mb-2">
@@ -105,16 +105,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
             </div>
           </div>
         ))}
-      </div>
-      
-      {/* Product Detail Modal */}
-      {selectedProduct && (
-        <ProductDetailModal
-          product={selectedProduct}
-          onClose={closeProductModal}
-        />
-      )}
-    </>
+    </div>
   );
 };
 

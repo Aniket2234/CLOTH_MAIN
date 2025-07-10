@@ -1,15 +1,16 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
 import { useProducts } from '../contexts/ProductContext';
-import ProductDetailModal from './ProductDetailModal';
-import { useProductModal } from '../hooks/useProductModal';
 
 const NewArrivalsSection = () => {
   const { products } = useProducts();
-  const { selectedProduct, openProductModal, closeProductModal } = useProductModal();
   
   // Filter products to only show new arrivals
   const newArrivalProducts = products.filter(product => product.isNewArrival);
+
+  const handleProductClick = (product: any) => {
+    window.location.hash = `#/product/${product._id}`;
+  };
 
   return (
     <section className="py-16 bg-white">
@@ -71,14 +72,6 @@ const NewArrivalsSection = () => {
           </div>
         )}
         
-        {/* Product Detail Modal */}
-        {selectedProduct && (
-          <ProductDetailModal
-            product={selectedProduct}
-            onClose={closeProductModal}
-          />
-        )}
-        
         {newArrivalProducts.length > 8 && (
           <div className="text-center mt-8">
             <button 
@@ -87,6 +80,7 @@ const NewArrivalsSection = () => {
                 window.dispatchEvent(new CustomEvent('navigate', { detail: { page: 'new-arrivals' } }));
               }}
               className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors duration-200"
+              onClick={() => handleProductClick(product)}
             >
               View All New Arrivals ({newArrivalProducts.length})
             </button>

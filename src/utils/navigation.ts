@@ -10,5 +10,8 @@ export const navigateToPage = (pageName: string) => {
 
 export const getPageFromHash = (): string => {
   const hash = window.location.hash.slice(2); // Remove '#/'
+  if (hash.startsWith('product/')) {
+    return 'product';
+  }
   return hash || 'home';
 };

@@ -19,6 +19,7 @@ import Accessories from './pages/Accessories';
 import NewArrivals from './pages/NewArrivals';
 import Summer2025 from './pages/Summer2025';
 import Cart from './pages/Cart';
+import ProductView from './pages/ProductView';
 import { getPageFromHash, navigateToPage } from './utils/navigation';
 import ScrollToTop from './components/ScrollToTop';
 
@@ -49,6 +50,8 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
+      case 'product':
+        return <ProductView />;
       case 't-shirts':
         return <TShirts />;
       case 'shirts':
