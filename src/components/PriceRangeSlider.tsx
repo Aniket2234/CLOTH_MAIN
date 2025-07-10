@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 
 interface PriceRangeSliderProps {
   min: number;
@@ -16,97 +16,118 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
   step = 50
 }) => {
   const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null);
-  const [tempValue, setTempValue] = useState<[number, number]>(value);
+  const [dragOffset, setDragOffset] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
+
+  // Sync internal state with external value changes
+  useEffect(() => {
+    if (!isDragging) {
+      // Only update when not dragging to prevent conflicts
+    }
+  }, [value, isDragging]);
 
   const getPercentage = useCallback((val: number) => {
     if (max === min) return 0;
-    return ((val - min) / (max - min)) * 100;
+    return Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
   }, [min, max]);
 
   const getValueFromPercentage = useCallback((percentage: number) => {
-    const rawValue = min + (percentage / 100) * (max - min);
-    // Only apply step rounding when dragging ends, not during dragging
-    return rawValue;
+    const clampedPercentage = Math.max(0, Math.min(100, percentage));
+    return min + (clampedPercentage / 100) * (max - min);
   }, [min, max]);
 
   const snapToStep = useCallback((val: number) => {
-    return Math.round(val / step) * step;
-  }, [step]);
+    const snapped = Math.round(val / step) * step;
+    return Math.max(min, Math.min(max, snapped));
+  }, [step, min, max]);
 
-  const updateValue = useCallback((clientX: number, handleType: 'min' | 'max', isTemporary = false) => {
+  const updateValueFromPosition = useCallback((clientX: number, handleType: 'min' | 'max', shouldSnap = false) => {
     if (!sliderRef.current) return;
 
     const rect = sliderRef.current.getBoundingClientRect();
-    const percentage = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+    const relativeX = clientX - rect.left - dragOffset;
+    const percentage = (relativeX / rect.width) * 100;
     const rawValue = getValueFromPercentage(percentage);
-
+    
+    let newValue = shouldSnap ? snapToStep(rawValue) : rawValue;
     let newRange: [number, number];
 
     if (handleType === 'min') {
-      const newMin = Math.max(min, Math.min(rawValue, tempValue[1] - step));
-      newRange = [newMin, tempValue[1]];
+      // Ensure min doesn't exceed max minus one step
+      newValue = Math.min(newValue, value[1] - step);
+      newValue = Math.max(min, newValue);
+      newRange = [newValue, value[1]];
     } else {
-      const newMax = Math.min(max, Math.max(rawValue, tempValue[0] + step));
-      newRange = [tempValue[0], newMax];
+      // Ensure max doesn't go below min plus one step
+      newValue = Math.max(newValue, value[0] + step);
+      newValue = Math.min(max, newValue);
+      newRange = [value[0], newValue];
     }
 
-    if (isTemporary) {
-      // During dragging, update temp value for smooth visual feedback
-      setTempValue(newRange);
-    } else {
-      // On release, snap to step and update actual value
-      const snappedRange: [number, number] = [
-        snapToStep(newRange[0]),
-        snapToStep(newRange[1])
-      ];
-      setTempValue(snappedRange);
-      onChange(snappedRange);
-    }
-  }, [tempValue, min, max, step, onChange, getValueFromPercentage, snapToStep]);
+    onChange(newRange);
+  }, [value, min, max, step, onChange, getValueFromPercentage, snapToStep, dragOffset]);
 
   const handleMouseDown = (type: 'min' | 'max') => (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!sliderRef.current) return;
+
+    const rect = sliderRef.current.getBoundingClientRect();
+    const handlePosition = getPercentage(value[type === 'min' ? 0 : 1]);
+    const handlePixelPosition = (handlePosition / 100) * rect.width;
+    const clickOffset = e.clientX - rect.left - handlePixelPosition;
+    
+    setDragOffset(clickOffset);
     setIsDragging(type);
-    setTempValue(value); // Initialize temp value
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       moveEvent.preventDefault();
-      updateValue(moveEvent.clientX, type, true); // Temporary update during drag
+      updateValueFromPosition(moveEvent.clientX, type, false);
     };
 
     const handleMouseUp = (upEvent: MouseEvent) => {
-      updateValue(upEvent.clientX, type, false); // Final update with snapping
+      updateValueFromPosition(upEvent.clientX, type, true); // Snap on release
       setIsDragging(null);
+      setDragOffset(0);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
       document.body.style.userSelect = '';
+      document.body.style.cursor = '';
     };
 
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
     document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'grabbing';
   };
 
   const handleTouchStart = (type: 'min' | 'max') => (e: React.TouchEvent) => {
     e.preventDefault();
+    
+    if (!sliderRef.current || e.touches.length === 0) return;
+
+    const rect = sliderRef.current.getBoundingClientRect();
+    const handlePosition = getPercentage(value[type === 'min' ? 0 : 1]);
+    const handlePixelPosition = (handlePosition / 100) * rect.width;
+    const touchOffset = e.touches[0].clientX - rect.left - handlePixelPosition;
+    
+    setDragOffset(touchOffset);
     setIsDragging(type);
-    setTempValue(value); // Initialize temp value
 
     const handleTouchMove = (moveEvent: TouchEvent) => {
       moveEvent.preventDefault();
       if (moveEvent.touches.length > 0) {
-        updateValue(moveEvent.touches[0].clientX, type, true); // Temporary update during drag
+        updateValueFromPosition(moveEvent.touches[0].clientX, type, false);
       }
     };
 
     const handleTouchEnd = (endEvent: TouchEvent) => {
-      // Use the last known position for final update
       if (endEvent.changedTouches.length > 0) {
-        updateValue(endEvent.changedTouches[0].clientX, type, false); // Final update with snapping
+        updateValueFromPosition(endEvent.changedTouches[0].clientX, type, true); // Snap on release
       }
       setIsDragging(null);
+      setDragOffset(0);
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
     };
@@ -115,7 +136,7 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
     document.addEventListener('touchend', handleTouchEnd);
   };
 
-  // Handle track click
+  // Handle track click - click to move nearest handle
   const handleTrackClick = (e: React.MouseEvent) => {
     if (isDragging) return;
 
@@ -130,21 +151,27 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
     const distanceToMax = Math.abs(clickValue - value[1]);
 
     const handleType = distanceToMin < distanceToMax ? 'min' : 'max';
-    setTempValue(value);
-    updateValue(e.clientX, handleType, false); // Direct update with snapping
+    const snappedValue = snapToStep(clickValue);
+    
+    let newRange: [number, number];
+    if (handleType === 'min') {
+      newRange = [Math.min(snappedValue, value[1] - step), value[1]];
+    } else {
+      newRange = [value[0], Math.max(snappedValue, value[0] + step)];
+    }
+
+    onChange(newRange);
   };
 
-  // Use temp value during dragging for smooth movement, actual value otherwise
-  const displayValue = isDragging ? tempValue : value;
-  const minPercentage = getPercentage(displayValue[0]);
-  const maxPercentage = getPercentage(displayValue[1]);
+  const minPercentage = getPercentage(value[0]);
+  const maxPercentage = getPercentage(value[1]);
 
   return (
     <div className="px-2 py-4">
       <div className="mb-4">
         <div className="flex justify-between text-sm font-medium text-gray-700 mb-3">
-          <span>₹{Math.round(displayValue[0]).toLocaleString()}</span>
-          <span>₹{Math.round(displayValue[1]).toLocaleString()}</span>
+          <span>₹{Math.round(value[0]).toLocaleString()}</span>
+          <span>₹{Math.round(value[1]).toLocaleString()}</span>
         </div>
         
         <div
@@ -154,7 +181,7 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
         >
           {/* Active Track */}
           <div
-            className="absolute h-2 bg-black rounded-full pointer-events-none transition-all duration-75 ease-out"
+            className="absolute h-2 bg-black rounded-full pointer-events-none"
             style={{
               left: `${minPercentage}%`,
               width: `${maxPercentage - minPercentage}%`
@@ -163,14 +190,13 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
           
           {/* Min Handle */}
           <div
-            className={`absolute w-5 h-5 bg-white border-2 border-black rounded-full shadow-lg cursor-grab transform -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 transition-all duration-75 ease-out ${
+            className={`absolute w-5 h-5 bg-white border-2 border-black rounded-full shadow-lg cursor-grab transform -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 transition-transform duration-150 ease-out ${
               isDragging === 'min' 
-                ? 'cursor-grabbing scale-110 shadow-xl border-gray-800' 
-                : 'hover:scale-105 hover:shadow-md'
+                ? 'cursor-grabbing scale-110 shadow-xl' 
+                : 'hover:scale-105'
             }`}
             style={{ 
-              left: `${minPercentage}%`,
-              transition: isDragging === 'min' ? 'none' : 'all 0.075s ease-out'
+              left: `${minPercentage}%`
             }}
             onMouseDown={handleMouseDown('min')}
             onTouchStart={handleTouchStart('min')}
@@ -178,14 +204,13 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
           
           {/* Max Handle */}
           <div
-            className={`absolute w-5 h-5 bg-white border-2 border-black rounded-full shadow-lg cursor-grab transform -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 transition-all duration-75 ease-out ${
+            className={`absolute w-5 h-5 bg-white border-2 border-black rounded-full shadow-lg cursor-grab transform -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 transition-transform duration-150 ease-out ${
               isDragging === 'max' 
-                ? 'cursor-grabbing scale-110 shadow-xl border-gray-800' 
-                : 'hover:scale-105 hover:shadow-md'
+                ? 'cursor-grabbing scale-110 shadow-xl' 
+                : 'hover:scale-105'
             }`}
             style={{ 
-              left: `${maxPercentage}%`,
-              transition: isDragging === 'max' ? 'none' : 'all 0.075s ease-out'
+              left: `${maxPercentage}%`
             }}
             onMouseDown={handleMouseDown('max')}
             onTouchStart={handleTouchStart('max')}
