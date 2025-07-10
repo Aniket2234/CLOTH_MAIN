@@ -1,9 +1,12 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
 import { useProducts } from '../contexts/ProductContext';
+import ProductDetailModal from './ProductDetailModal';
+import { useProductModal } from '../hooks/useProductModal';
 
 const NewArrivalsSection = () => {
   const { products } = useProducts();
+  const { selectedProduct, openProductModal, closeProductModal } = useProductModal();
   
   // Filter products to only show new arrivals
   const newArrivalProducts = products.filter(product => product.isNewArrival);
@@ -27,6 +30,7 @@ const NewArrivalsSection = () => {
               <div
                 key={product._id}
                 className="group cursor-pointer"
+                onClick={() => openProductModal(product)}
               >
                 <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-[3/4]">
                   {/* New Arrival Badge */}
@@ -65,6 +69,14 @@ const NewArrivalsSection = () => {
               </div>
             ))}
           </div>
+        )}
+        
+        {/* Product Detail Modal */}
+        {selectedProduct && (
+          <ProductDetailModal
+            product={selectedProduct}
+            onClose={closeProductModal}
+          />
         )}
         
         {newArrivalProducts.length > 8 && (

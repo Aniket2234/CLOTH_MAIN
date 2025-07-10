@@ -5,11 +5,14 @@ import Breadcrumb from '../components/Breadcrumb';
 import { ArrowLeft, X, Heart, Star } from 'lucide-react';
 import { useProducts } from '../contexts/ProductContext';
 import { useProductFilters } from '../hooks/useProductFilters';
+import ProductDetailModal from '../components/ProductDetailModal';
+import { useProductModal } from '../hooks/useProductModal';
 
 const NewArrivals = () => {
   const { products } = useProducts();
   const allNewArrivals = products.filter(p => p.isNewArrival);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const { selectedProduct, openProductModal, closeProductModal } = useProductModal();
 
 
   const {
@@ -200,6 +203,7 @@ const NewArrivals = () => {
                     className="group relative"
                     onMouseEnter={() => setHoveredProduct(product._id!)}
                     onMouseLeave={() => setHoveredProduct(null)}
+                    onClick={() => openProductModal(product)}
                   >
                     <div className="aspect-[5.5/6.5] bg-gray-100 mb-2 overflow-hidden rounded-md relative">
                       {/* New Arrival Badge */}
@@ -211,7 +215,10 @@ const NewArrivals = () => {
                       
                       {/* Favorite Button */}
                       <button
-                        onClick={() => toggleFavorite(product._id!)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(product._id!);
+                        }}
                         className="absolute top-2 right-2 z-10 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors duration-200"
                       >
                         <Heart 
@@ -271,6 +278,14 @@ const NewArrivals = () => {
               </div>
             )}
           </div>
+          
+          {/* Product Detail Modal */}
+          {selectedProduct && (
+            <ProductDetailModal
+              product={selectedProduct}
+              onClose={closeProductModal}
+            />
+          )}
         </div>
       </div>
     </div>
