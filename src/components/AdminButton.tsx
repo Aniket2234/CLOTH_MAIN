@@ -9,10 +9,10 @@ const AdminButton = () => {
     <>
       <button
         onClick={() => setShowAdminPanel(true)}
-        className="fixed top-4 right-4 z-[60] bg-black text-white p-3 rounded-full shadow-lg hover:bg-gray-800 transition-all duration-200 transform hover:scale-110"
+        className="fixed bottom-8 right-20 z-50 bg-black text-white p-2 rounded-full shadow-lg hover:bg-gray-800 transition-all duration-200 transform hover:scale-110"
         title="Admin Panel"
       >
-        <Settings className="w-6 h-6" />
+        <Settings className="w-4 h-4" />
       </button>
       
       {showAdminPanel && (
