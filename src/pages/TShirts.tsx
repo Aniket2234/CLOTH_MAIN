@@ -63,8 +63,7 @@ const TShirts = () => {
     }
 
     setFilteredProducts(filtered);
-  }
-  )
+  }, [activeFilters, allProducts]);
 
   const handleGoBack = () => {
     window.history.back();
