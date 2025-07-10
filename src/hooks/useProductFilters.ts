@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Product } from '../types/Product';
 
 interface FilterOptions {
@@ -24,12 +24,31 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedSleeves, setSelectedSleeves] = useState<string[]>([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [sortOption, setSortOption] = useState<string>('default');
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
 
-  // Generate dynamic price ranges based on product prices
-  const generatePriceRanges = (products: Product[]) => {
+  // Calculate min/max prices from products - memoized to prevent recalculation
+  const { minPrice, maxPrice } = useMemo(() => {
+    if (products.length === 0) {
+      return { minPrice: 0, maxPrice: 10000 };
+    }
+    const prices = products.map(p => p.price);
+    return {
+      minPrice: Math.min(...prices),
+      maxPrice: Math.max(...prices)
+    };
+  }, [products]);
+
+  // Initialize price range state with memoized values
+  const [priceRange, setPriceRange] = useState<[number, number]>(() => [minPrice, maxPrice]);
+
+  // Update price range only when products change (not on every render)
+  useEffect(() => {
+    setPriceRange([minPrice, maxPrice]);
+  }, [minPrice, maxPrice]);
+
+  // Generate dynamic price ranges based on product prices - memoized
+  const generatePriceRanges = useMemo(() => {
     if (products.length === 0) {
       return [
         { min: 0, max: 999, label: '₹0 - ₹999' },
@@ -41,9 +60,6 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
     }
 
     const prices = products.map(p => p.price).sort((a, b) => a - b);
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-    
     const ranges = [];
     
     // Create standard ranges
@@ -86,30 +102,21 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
     }
 
     return ranges;
-  };
+  }, [products, minPrice, maxPrice]);
 
-  // Generate dynamic filter options based on products
-  const filterOptions: FilterOptions = {
+  // Generate dynamic filter options based on products - memoized
+  const filterOptions: FilterOptions = useMemo(() => ({
     colors: ['Brown', 'Blue', 'Navy Blue', 'Light Blue', 'Black', 'Orange', 'Yellow',
       'Red', 'Green', 'Purple', 'Pink', 'Gray', 'Maroon', 'Teal', 'Olive',
       'Lime', 'Aqua', 'Silver', 'Navy', 'Fuchsia', 'Coral', 'Indigo', 'White'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '28', '30', '32', '34', '36', '38', '40', '42'],
     sleeves: ['Full Sleeves', 'Half Sleeves', 'Sleeveless'],
-    priceRanges: generatePriceRanges(products),
-    minPrice: products.length > 0 ? Math.min(...products.map(p => p.price)) : 0,
-    maxPrice: products.length > 0 ? Math.max(...products.map(p => p.price)) : 10000
-  };
+    priceRanges: generatePriceRanges,
+    minPrice,
+    maxPrice
+  }), [generatePriceRanges, minPrice, maxPrice]);
 
-  // Initialize price range based on products
-  useEffect(() => {
-    if (products.length > 0) {
-      const minPrice = Math.min(...products.map(p => p.price));
-      const maxPrice = Math.max(...products.map(p => p.price));
-      setPriceRange([minPrice, maxPrice]);
-    }
-  }, [products]);
-
-  // Apply filters and sorting
+  // Apply filters and sorting - memoized to prevent unnecessary recalculations
   useEffect(() => {
     let result = [...products];
 
@@ -142,10 +149,7 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
     }
 
     // Price range filter (slider) - only apply if range is different from min/max
-    const productMinPrice = products.length > 0 ? Math.min(...products.map(p => p.price)) : 0;
-    const productMaxPrice = products.length > 0 ? Math.max(...products.map(p => p.price)) : 10000;
-    
-    if (priceRange[0] !== productMinPrice || priceRange[1] !== productMaxPrice) {
+    if (priceRange[0] !== minPrice || priceRange[1] !== maxPrice) {
       result = result.filter(product => 
         product.price >= priceRange[0] && product.price <= priceRange[1]
       );
@@ -190,7 +194,9 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
     priceRange,
     sortOption,
     products,
-    filterOptions.priceRanges
+    filterOptions.priceRanges,
+    minPrice,
+    maxPrice
   ]);
 
   const handleColorToggle = (color: string) => {
@@ -252,11 +258,7 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
     setSelectedSleeves([]);
     setSelectedPriceRanges([]);
     setSortOption('default');
-    if (products.length > 0) {
-      const minPrice = Math.min(...products.map(p => p.price));
-      const maxPrice = Math.max(...products.map(p => p.price));
-      setPriceRange([minPrice, maxPrice]);
-    }
+    setPriceRange([minPrice, maxPrice]);
   };
 
   return {
