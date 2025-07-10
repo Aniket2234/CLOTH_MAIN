@@ -31,7 +31,7 @@ const NewArrivalsSection = () => {
               <div
                 key={product._id}
                 className="group cursor-pointer"
-                onClick={() => openProductModal(product)}
+                onClick={() => handleProductClick(product)}
               >
                 <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-[3/4]">
                   {/* New Arrival Badge */}
@@ -80,7 +80,6 @@ const NewArrivalsSection = () => {
                 window.dispatchEvent(new CustomEvent('navigate', { detail: { page: 'new-arrivals' } }));
               }}
               className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors duration-200"
-              onClick={() => handleProductClick(product)}
             >
               View All New Arrivals ({newArrivalProducts.length})
             </button>
