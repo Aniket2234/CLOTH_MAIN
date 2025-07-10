@@ -44,7 +44,7 @@ const Cart = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="bg-white">
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <button
@@ -72,7 +72,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <button

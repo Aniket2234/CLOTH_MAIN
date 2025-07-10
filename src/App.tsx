@@ -79,8 +79,11 @@ function App() {
   };
 
   return (
-    <div>
-      {renderPage()}
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1">
+        {renderPage()}
+      </div>
+      <Footer />
     </div>
   );
 }
