@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Package, Palette, Ruler, Shirt } from 'lucide-react';
+import { X, Package, Palette, Ruler, Shirt, Info } from 'lucide-react';
 import { Product } from '../types/Product';
 
 interface ProductViewModalProps {
@@ -10,7 +10,7 @@ interface ProductViewModalProps {
 const ProductViewModal: React.FC<ProductViewModalProps> = ({ product, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">Product Details</h2>
           <button
@@ -23,13 +23,25 @@ const ProductViewModal: React.FC<ProductViewModalProps> = ({ product, onClose })
         
         <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Product Image */}
+            {/* Product Images */}
             <div className="space-y-4">
               <img
                 src={product.image}
                 alt={product.name}
                 className="w-full h-96 object-cover rounded-lg"
               />
+              {product.images && product.images.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {product.images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`${product.name} ${index + 1}`}
+                      className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                    />
+                  ))}
+                </div>
+              )}
             </div>
             
             {/* Product Information */}
@@ -123,6 +135,74 @@ const ProductViewModal: React.FC<ProductViewModalProps> = ({ product, onClose })
                   <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-lg text-sm font-medium capitalize">
                     {product.sleeves.replace('-', ' ')}
                   </span>
+                </div>
+              )}
+
+              {/* Specifications */}
+              {product.specifications && (
+                <div>
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Info className="w-5 h-5 text-gray-500" />
+                    <h4 className="text-lg font-semibold text-gray-900">Specifications</h4>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                      {product.specifications.fit && (
+                        <div>
+                          <span className="font-medium text-gray-700">Fit:</span>
+                          <span className="ml-2 text-gray-600">{product.specifications.fit}</span>
+                        </div>
+                      )}
+                      {product.specifications.occasion && (
+                        <div>
+                          <span className="font-medium text-gray-700">Occasion:</span>
+                          <span className="ml-2 text-gray-600">{product.specifications.occasion}</span>
+                        </div>
+                      )}
+                      {product.specifications.fabric && (
+                        <div>
+                          <span className="font-medium text-gray-700">Fabric:</span>
+                          <span className="ml-2 text-gray-600">{product.specifications.fabric}</span>
+                        </div>
+                      )}
+                      {product.specifications.collar && (
+                        <div>
+                          <span className="font-medium text-gray-700">Collar:</span>
+                          <span className="ml-2 text-gray-600">{product.specifications.collar}</span>
+                        </div>
+                      )}
+                      {product.specifications.pattern && (
+                        <div>
+                          <span className="font-medium text-gray-700">Pattern:</span>
+                          <span className="ml-2 text-gray-600">{product.specifications.pattern}</span>
+                        </div>
+                      )}
+                      {product.specifications.care && (
+                        <div>
+                          <span className="font-medium text-gray-700">Care:</span>
+                          <span className="ml-2 text-gray-600">{product.specifications.care}</span>
+                        </div>
+                      )}
+                      {product.specifications.brand && (
+                        <div>
+                          <span className="font-medium text-gray-700">Brand:</span>
+                          <span className="ml-2 text-gray-600">{product.specifications.brand}</span>
+                        </div>
+                      )}
+                      {product.specifications.countryOfOrigin && (
+                        <div>
+                          <span className="font-medium text-gray-700">Country of Origin:</span>
+                          <span className="ml-2 text-gray-600">{product.specifications.countryOfOrigin}</span>
+                        </div>
+                      )}
+                      {product.specifications.manufacturer && (
+                        <div>
+                          <span className="font-medium text-gray-700">Manufacturer:</span>
+                          <span className="ml-2 text-gray-600">{product.specifications.manufacturer}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
               
