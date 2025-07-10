@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProductProvider } from './contexts/ProductContext';
+import AdminButton from './components/AdminButton';
 import Header from './components/Header';
 import HeroCarousel from './components/HeroCarousel';
 import CategoryCollections from './components/CategoryCollections';
@@ -79,13 +82,18 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1">
-        {renderPage()}
-      </div>
-      <Footer />
-      <ScrollToTop />
-    </div>
+    <AuthProvider>
+      <ProductProvider>
+        <div className="min-h-screen flex flex-col">
+          <AdminButton />
+          <div className="flex-1">
+            {renderPage()}
+          </div>
+          <Footer />
+          <ScrollToTop />
+        </div>
+      </ProductProvider>
+    </AuthProvider>
   );
 }
 
