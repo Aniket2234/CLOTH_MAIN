@@ -29,25 +29,38 @@ const StoreLocationSection = () => {
           {/* Google Map */}
           <div className="relative bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="aspect-video">
-              <iframe
-                src="https://maps.google.com/maps?width=100%25&amp;height=300&amp;hl=en&amp;q=Nikzone%20Mens%20Beautiq,%20Shop%20No.%2015,%20Ground%20Floor,%20Kalpataru%20Complex,%20Near%20City%20Mall,%20Nashik,%20Maharashtra%20422001+(Nikzone%20Mens%20Beautiq)&amp;t=&amp;z=16&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Nikzone Mens Beautiq Location"
-              ></iframe>
+              {/* Map Placeholder with Store Image */}
+              <div className="relative w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MapPin className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">Nikzone Mens Beautiq</h3>
+                  <p className="text-sm text-gray-600 mb-4 max-w-xs">
+                    Shop No. 15, Ground Floor, Kalpataru Complex<br />
+                    Near City Mall, Nashik, Maharashtra
+                  </p>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+                    <MapPin className="w-4 h-4" />
+                    <span>19.2178555, 73.143845</span>
+                  </div>
+                </div>
+                
+                {/* Decorative elements */}
+                <div className="absolute top-4 left-4 w-3 h-3 bg-red-400 rounded-full opacity-60"></div>
+                <div className="absolute top-8 right-6 w-2 h-2 bg-blue-400 rounded-full opacity-40"></div>
+                <div className="absolute bottom-6 left-8 w-4 h-4 bg-green-400 rounded-full opacity-30"></div>
+                <div className="absolute bottom-4 right-4 w-2 h-2 bg-purple-400 rounded-full opacity-50"></div>
+              </div>
             </div>
             
             {/* Get Directions Button */}
             <button
               onClick={handleGetDirections}
-              className="absolute bottom-3 right-3 bg-black text-white px-3 py-1.5 rounded-full text-xs font-medium hover:bg-gray-800 transition-colors duration-200 flex items-center space-x-1.5 shadow-md"
+              className="absolute bottom-4 right-4 bg-black text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              <Navigation className="w-3 h-3" />
-              <span>Get Directions</span>
+              <Navigation className="w-4 h-4" />
+              <span>View on Maps</span>
             </button>
           </div>
           
