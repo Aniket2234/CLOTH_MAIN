@@ -73,7 +73,6 @@ function App() {
             <NewArrivalsSection />
             <HappyCustomers />
             <StoreLocationSection />
-            <Footer />
           </>
         );
     }
