@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Phone, Clock, Mail, Navigation } from 'lucide-react';
+import { MapPin, Phone, Clock, Mail, Navigation, ExternalLink } from 'lucide-react';
 
 const StoreLocationSection = () => {
   const storeDetails = {
@@ -25,8 +25,12 @@ const StoreLocationSection = () => {
     window.open(`tel:${storeDetails.phone}`);
   };
 
-  // Google Maps Embed URL with proper parameters
-  const mapEmbedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3749.8234567890123!2d${storeDetails.coordinates.lng}!3d${storeDetails.coordinates.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be795cc246a1e07%3A0x51423a878bd662b4!2sNikzone%20Mens%20Beautiq!5e0!3m2!1sen!2sin!4v1640995200000!5m2!1sen!2sin`;
+  const handleOpenInMaps = () => {
+    window.open(`https://www.google.com/maps/search/?api=1&query=${storeDetails.coordinates.lat},${storeDetails.coordinates.lng}`, '_blank');
+  };
+
+  // OpenStreetMap embed URL - this always works without API keys
+  const osmMapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${storeDetails.coordinates.lng-0.01},${storeDetails.coordinates.lat-0.01},${storeDetails.coordinates.lng+0.01},${storeDetails.coordinates.lat+0.01}&layer=mapnik&marker=${storeDetails.coordinates.lat},${storeDetails.coordinates.lng}`;
 
   return (
     <section className="py-8 bg-gray-50">
@@ -37,30 +41,48 @@ const StoreLocationSection = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-          {/* Live Google Map */}
+          {/* Interactive Map */}
           <div className="relative bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="aspect-video">
+            <div className="aspect-video relative">
+              {/* OpenStreetMap Embed */}
               <iframe
-                src={mapEmbedUrl}
+                src={osmMapUrl}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
                 title="Nikzone Mens Beautiq Location"
                 className="rounded-lg"
+                loading="lazy"
               />
+              
+              {/* Map Overlay with Store Info */}
+              <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-3 max-w-xs">
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <h4 className="font-semibold text-sm text-gray-900">Nikzone Mens Beautiq</h4>
+                </div>
+                <p className="text-xs text-gray-600">Kalpataru Complex, Nashik</p>
+              </div>
             </div>
             
-            {/* Overlay Get Directions Button */}
-            <button
-              onClick={handleGetDirections}
-              className="absolute bottom-4 right-4 bg-black text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              <Navigation className="w-4 h-4" />
-              <span>Get Directions</span>
-            </button>
+            {/* Map Action Buttons */}
+            <div className="absolute bottom-4 right-4 flex space-x-2">
+              <button
+                onClick={handleOpenInMaps}
+                className="bg-white text-gray-700 px-3 py-2 rounded-full text-sm font-medium hover:bg-gray-50 transition-all duration-200 flex items-center space-x-1 shadow-lg border border-gray-200"
+                title="Open in Google Maps"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span className="hidden sm:inline">View Larger</span>
+              </button>
+              <button
+                onClick={handleGetDirections}
+                className="bg-black text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-all duration-200 flex items-center space-x-2 shadow-lg"
+              >
+                <Navigation className="w-4 h-4" />
+                <span>Directions</span>
+              </button>
+            </div>
           </div>
           
           {/* Store Information */}
@@ -144,6 +166,17 @@ const StoreLocationSection = () => {
               </button>
             </div>
             
+            {/* Quick Actions */}
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={handleOpenInMaps}
+                className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center space-x-2"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>Open in Maps</span>
+              </button>
+            </div>
+            
             {/* Visit Us Today Section */}
             <div className="mt-6 pt-4 border-t border-gray-100">
               <h4 className="text-lg font-bold text-gray-900 mb-2">Visit Us Today!</h4>
@@ -152,6 +185,18 @@ const StoreLocationSection = () => {
               </p>
             </div>
           </div>
+        </div>
+        
+        {/* Additional Map Info */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            Can't see the map? <button 
+              onClick={handleOpenInMaps}
+              className="text-blue-600 hover:text-blue-800 underline font-medium"
+            >
+              Click here to open in Google Maps
+            </button>
+          </p>
         </div>
       </div>
     </section>
