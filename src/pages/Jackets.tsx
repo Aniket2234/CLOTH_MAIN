@@ -279,6 +279,7 @@ const Jackets = () => {
           </div>
          
          {/* Product Detail Modal */}
+        </div>
       </div>
     </div>
   );

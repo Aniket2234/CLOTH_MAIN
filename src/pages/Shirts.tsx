@@ -279,6 +279,7 @@ const Shirts = () => {
           </div>
           
           {/* Product Detail Modal */}
+        </div>
       </div>
     </div>
   );

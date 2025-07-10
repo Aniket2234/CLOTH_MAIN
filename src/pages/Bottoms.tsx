@@ -268,6 +268,7 @@ const Bottoms = () => {
           </div>
           
           {/* Product Detail Modal */}
+        </div>
       </div>
     </div>
   );
