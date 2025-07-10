@@ -88,6 +88,9 @@ export const useProductFilters = ({ products }: UseProductFiltersProps) => {
         label: `₹${highestRangeStart.toLocaleString()} & Above` 
       });
     }
+    
+    return ranges;
+  }, [priceInfo]);
 
   const dynamicStep = useMemo(() => {
     const range = priceInfo.maxPrice - priceInfo.minPrice;
