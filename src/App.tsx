@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProductProvider } from './contexts/ProductContext';
+import { CartProvider } from './contexts/CartContext';
 import Header from './components/Header';
 import AdminPanel from './components/AdminPanel';
 import HeroCarousel from './components/HeroCarousel';
@@ -89,13 +90,15 @@ function App() {
   return (
     <AuthProvider>
       <ProductProvider>
-        <div className="min-h-screen flex flex-col">
-          <div className="flex-1">
-            {renderPage()}
+        <CartProvider>
+          <div className="min-h-screen flex flex-col">
+            <div className="flex-1">
+              {renderPage()}
+            </div>
+            {currentPage !== 'admin' && <Footer />}
+            <ScrollToTop />
           </div>
-          {currentPage !== 'admin' && <Footer />}
-          <ScrollToTop />
-        </div>
+        </CartProvider>
       </ProductProvider>
     </AuthProvider>
   );

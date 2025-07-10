@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useProducts } from '../contexts/ProductContext';
 import { LogOut, Plus, Package, BarChart3, Users, Settings } from 'lucide-react';
+import { useCart } from '../contexts/CartContext';
 import ProductForm from './ProductForm';
 import ProductList from './ProductList';
+import EmailJSConfig from './EmailJSConfig';
 
 interface AdminDashboardProps {
   onClose: () => void;
@@ -12,6 +14,7 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
   const { logout } = useAuth();
   const { products } = useProducts();
+  const { getTotalItems } = useCart();
   const [activeTab, setActiveTab] = useState('overview');
 
   const handleLogout = () => {
@@ -43,6 +46,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
       value: products.filter(p => p.category === 'bottoms').length,
       icon: Package,
       color: 'bg-orange-500'
+    },
+    {
+      title: 'Cart Items',
+      value: getTotalItems(),
+      icon: Package,
+      color: 'bg-red-500'
     }
   ];
 
@@ -162,13 +171,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
           {activeTab === 'settings' && (
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-8">Settings</h2>
-              <div className="bg-white p-6 rounded-lg border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Admin Credentials</h3>
-                <p className="text-gray-600 mb-4">Change your admin username and password</p>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-yellow-800 text-sm">
-                    Credential management will be implemented with MongoDB integration.
-                  </p>
+              <div className="space-y-8">
+                <EmailJSConfig />
+                
+                <div className="bg-white p-6 rounded-lg border border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Admin Credentials</h3>
+                  <p className="text-gray-600 mb-4">Change your admin username and password</p>
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p className="text-yellow-800 text-sm">
+                      Credential management will be implemented with MongoDB integration.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

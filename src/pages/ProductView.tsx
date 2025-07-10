@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { X, Heart, ShoppingBag, Star, ChevronLeft, ChevronRight, Plus, Minus, ArrowLeft } from 'lucide-react';
 import { Product } from '../types/Product';
 import { useProducts } from '../contexts/ProductContext';
+import { useCart } from '../contexts/CartContext';
 import Header from '../components/Header';
+import CustomAlert from '../components/CustomAlert';
 
 const ProductView = () => {
   const { products } = useProducts();
@@ -12,6 +14,18 @@ const ProductView = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState('specifications');
   const [product, setProduct] = useState<Product | null>(null);
+  const { addToCart } = useCart();
+  const [alert, setAlert] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
 
   useEffect(() => {
     // Get product ID from URL hash
@@ -92,6 +106,26 @@ const ProductView = () => {
 
   const handleGoBack = () => {
     window.history.back();
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      setAlert({
+        isOpen: true,
+        title: 'Size Required',
+        message: 'Please select a size before adding to cart.',
+        type: 'warning'
+      });
+      return;
+    }
+
+    addToCart(product, selectedSize, quantity);
+    setAlert({
+      isOpen: true,
+      title: 'Added to Cart!',
+      message: `${product.name} (Size: ${selectedSize}) has been added to your cart.`,
+      type: 'success'
+    });
   };
 
   return (
@@ -281,7 +315,10 @@ const ProductView = () => {
             
             {/* Action Buttons */}
             <div className="space-y-4">
-              <button className="w-full bg-black text-white py-4 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center space-x-2 text-lg">
+              <button 
+                onClick={handleAddToCart}
+                className="w-full bg-black text-white py-4 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center space-x-2 text-lg"
+              >
                 <ShoppingBag className="w-6 h-6" />
                 <span>ADD TO BAG</span>
               </button>
@@ -501,6 +538,15 @@ const ProductView = () => {
           </div>
         )}
       </div>
+      
+      {/* Alert */}
+      <CustomAlert
+        isOpen={alert.isOpen}
+        onClose={() => setAlert(prev => ({ ...prev, isOpen: false }))}
+        title={alert.title}
+        message={alert.message}
+        type={alert.type}
+      />
     </div>
   );
 };

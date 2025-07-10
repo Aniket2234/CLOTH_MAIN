@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Search, ShoppingBag, Menu, X } from 'lucide-react';
 import { navigateToPage } from '../utils/navigation';
+import { useCart } from '../contexts/CartContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [cartCount, setCartCount] = useState(0);
+  const { getTotalItems } = useCart();
 
   const navigationItems = [
     'SUMMER 2025',
@@ -91,9 +92,9 @@ const Header = () => {
               className="relative p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200"
             >
               <ShoppingBag className="w-5 h-5 text-gray-700" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartCount}
+              {getTotalItems() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {getTotalItems()}
                 </span>
               )}
             </button>

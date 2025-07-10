@@ -1,46 +1,21 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import { ArrowLeft, ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  size: string;
-}
+import { useCart } from '../contexts/CartContext';
+import CheckoutForm from '../components/CheckoutForm';
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { cartItems, updateQuantity, removeFromCart, clearCart, getTotalPrice, getTotalItems } = useCart();
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const handleGoBack = () => {
     window.history.back();
   };
 
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity === 0) {
-      removeItem(id);
-      return;
-    }
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems(items => items.filter(item => item.id !== id));
-  };
-
-  const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
-  const clearCart = () => {
-    setCartItems([]);
-  };
+  const subtotal = getTotalPrice();
+  const shipping = 0; // Free shipping
+  const tax = Math.round(subtotal * 0.18); // 18% GST
+  const total = subtotal + shipping + tax;
 
   if (cartItems.length === 0) {
     return (
@@ -101,14 +76,14 @@ const Cart = () => {
                 <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                   <div className="flex items-center space-x-4">
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={item.product.image}
+                      alt={item.product.name}
                       className="w-20 h-20 object-cover rounded-lg"
                     />
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">{item.product.name}</h3>
                       <p className="text-gray-600">Size: {item.size}</p>
-                      <p className="text-lg font-bold text-gray-900">${item.price}</p>
+                      <p className="text-lg font-bold text-gray-900">₹{item.product.price}</p>
                     </div>
                     <div className="flex items-center space-x-3">
                       <button
@@ -125,7 +100,7 @@ const Cart = () => {
                         <Plus className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeFromCart(item.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors duration-200 ml-4"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -145,24 +120,27 @@ const Cart = () => {
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">${getTotalPrice().toFixed(2)}</span>
+                  <span className="font-medium">₹{subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping</span>
                   <span className="font-medium">Free</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">${(getTotalPrice() * 0.1).toFixed(2)}</span>
+                  <span className="text-gray-600">GST (18%)</span>
+                  <span className="font-medium">₹{tax.toLocaleString()}</span>
                 </div>
                 <hr className="border-gray-200" />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${(getTotalPrice() * 1.1).toFixed(2)}</span>
+                  <span>₹{total.toLocaleString()}</span>
                 </div>
               </div>
               
-              <button className="w-full bg-black text-white py-3 rounded-full font-medium hover:bg-gray-800 transition-colors duration-200 mb-3">
+              <button 
+                onClick={() => setShowCheckout(true)}
+                className="w-full bg-black text-white py-3 rounded-full font-medium hover:bg-gray-800 transition-colors duration-200 mb-3"
+              >
                 Proceed to Checkout
               </button>
               
@@ -176,6 +154,12 @@ const Cart = () => {
           </div>
         </div>
       </div>
+      
+      {/* Checkout Form */}
+      <CheckoutForm 
+        isOpen={showCheckout}
+        onClose={() => setShowCheckout(false)}
+      />
     </div>
   );
 };
