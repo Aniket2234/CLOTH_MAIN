@@ -1,67 +1,74 @@
 import { useState, useEffect } from 'react';
-import { Product, ProductFilter } from '../types/Product';
+import { Product } from '../types/Product';
+
+interface FilterOptions {
+  colors: string[];
+  sizes: string[];
+  sleeves: string[];
+  priceRanges: {
+    min: number;
+    max: number;
+    label: string;
+  }[];
+}
 
 interface UseProductFiltersProps {
   products: Product[];
-  initialFilters?: ProductFilter;
+  filterOptions: FilterOptions;
 }
 
-export const useProductFilters = ({ products, initialFilters }: UseProductFiltersProps) => {
+export const useProductFilters = ({ products, filterOptions }: UseProductFiltersProps) => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
-  const [activeFilters, setActiveFilters] = useState<ProductFilter>(
-    initialFilters || {
-      colors: [],
-      priceRanges: [],
-      sizes: [],
-      sleeves: []
-    }
-  );
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedSleeves, setSelectedSleeves] = useState<string[]>([]);
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState<string>('default');
+  const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
 
+  // Apply filters and sorting
   useEffect(() => {
     let result = [...products];
 
-    // Apply color filter
-    if (activeFilters.colors.length > 0) {
-      result = result.filter(product =>
-        product.colors.some(color => activeFilters.colors.includes(color))
+    // Color filter
+    if (selectedColors.length > 0) {
+      result = result.filter(product => 
+        product.colors.some(color => selectedColors.includes(color))
       );
     }
 
-    // Apply price range filter
-    if (activeFilters.priceRanges.length > 0) {
-      result = result.filter(product => {
-        return activeFilters.priceRanges.some(rangeLabel => {
-          const cleanRange = rangeLabel.replace(/₹|,/g, '');
-          const [minStr, maxStr] = cleanRange.split(' - ');
-          const min = parseFloat(minStr);
-          const max = parseFloat(maxStr);
-          return product.price >= min && product.price <= max;
-        });
-      });
-    }
-
-    // Apply size filter
-    if (activeFilters.sizes.length > 0) {
+    // Size filter
+    if (selectedSizes.length > 0) {
       result = result.filter(product =>
-        product.sizes.some(size => activeFilters.sizes.includes(size))
+        product.sizes.some(size => selectedSizes.includes(size))
       );
     }
 
-    // Apply sleeves filter
-    if (activeFilters.sleeves.length > 0) {
+    // Sleeves filter
+    if (selectedSleeves.length > 0) {
       result = result.filter(product => {
         const sleeveMap: { [key: string]: string } = {
           'Full Sleeves': 'full-sleeves',
-          'Half Sleeves': 'half-sleeves'
+          'Half Sleeves': 'half-sleeves',
+          'Sleeveless': 'sleeveless'
         };
-        return activeFilters.sleeves.some(sleeve => 
+        return selectedSleeves.some(sleeve => 
           product.sleeves === sleeveMap[sleeve]
         );
       });
     }
 
-    // Apply sorting
+    // Price range filter (supports multiple selections)
+    if (selectedPriceRanges.length > 0) {
+      result = result.filter(product => {
+        return selectedPriceRanges.some(rangeLabel => {
+          const range = filterOptions.priceRanges.find(r => r.label === rangeLabel);
+          return range && product.price >= range.min && product.price <= range.max;
+        });
+      });
+    }
+
+    // Sorting
     switch(sortOption) {
       case 'price-low-high':
         result.sort((a, b) => a.price - b.price);
@@ -72,35 +79,93 @@ export const useProductFilters = ({ products, initialFilters }: UseProductFilter
       case 'newest':
         result.sort((a, b) => (b._id || '').localeCompare(a._id || ''));
         break;
-      case 'name-a-z':
-        result.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'name-z-a':
-        result.sort((a, b) => b.name.localeCompare(a.name));
-        break;
       default:
         break;
     }
 
     setFilteredProducts(result);
-  }, [products, activeFilters, sortOption]);
+  }, [
+    selectedColors,
+    selectedSizes,
+    selectedSleeves,
+    selectedPriceRanges,
+    sortOption,
+    products,
+    filterOptions.priceRanges
+  ]);
+
+  const handleColorToggle = (color: string) => {
+    setSelectedColors(prev =>
+      prev.includes(color)
+        ? prev.filter(c => c !== color)
+        : [...prev, color]
+    );
+  };
+
+  const handleSizeToggle = (size: string) => {
+    setSelectedSizes(prev =>
+      prev.includes(size)
+        ? prev.filter(s => s !== size)
+        : [...prev, size]
+    );
+  };
+
+  const handleSleevesToggle = (sleeveType: string) => {
+    setSelectedSleeves(prev =>
+      prev.includes(sleeveType)
+        ? prev.filter(s => s !== sleeveType)
+        : [...prev, sleeveType]
+    );
+  };
+
+  const handlePriceRangeToggle = (rangeLabel: string) => {
+    setSelectedPriceRanges(prev =>
+      prev.includes(rangeLabel)
+        ? prev.filter(r => r !== rangeLabel)
+        : [...prev, rangeLabel]
+    );
+  };
+
+  const removeFilter = (type: string, value: string) => {
+    switch (type) {
+      case 'color':
+        setSelectedColors(prev => prev.filter(c => c !== value));
+        break;
+      case 'size':
+        setSelectedSizes(prev => prev.filter(s => s !== value));
+        break;
+      case 'sleeves':
+        setSelectedSleeves(prev => prev.filter(s => s !== value));
+        break;
+      case 'price':
+        setSelectedPriceRanges(prev => prev.filter(r => r !== value));
+        break;
+    }
+  };
 
   const resetFilters = () => {
-    setActiveFilters({
-      colors: [],
-      priceRanges: [],
-      sizes: [],
-      sleeves: []
-    });
+    setSelectedColors([]);
+    setSelectedSizes([]);
+    setSelectedSleeves([]);
+    setSelectedPriceRanges([]);
     setSortOption('default');
   };
 
   return {
     filteredProducts,
-    activeFilters,
-    setActiveFilters,
+    selectedColors,
+    selectedSizes,
+    selectedSleeves,
+    selectedPriceRanges,
     sortOption,
+    hoveredProduct,
     setSortOption,
+    setHoveredProduct,
+    handleColorToggle,
+    handleSizeToggle,
+    handleSleevesToggle,
+    handlePriceRangeToggle,
+    removeFilter,
     resetFilters
   };
 };

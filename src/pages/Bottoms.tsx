@@ -1,33 +1,75 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
 import ProductFilter from '../components/ProductFilter';
-import ProductGrid from '../components/ProductGrid';
+import Breadcrumb from '../components/Breadcrumb';
+import { ArrowLeft, X, Heart, Star } from 'lucide-react';
 import { useProducts } from '../contexts/ProductContext';
 import { useProductFilters } from '../hooks/useProductFilters';
-import { ArrowLeft } from 'lucide-react';
 
 const Bottoms = () => {
   const { getProductsByCategory } = useProducts();
   const allProducts = getProductsByCategory('bottoms');
-  
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  const filterOptions = {
+    colors: ['Brown', 'Blue', 'Navy Blue', 'Light Blue', 'Black', 'Orange', 'Yellow',
+      'Red', 'Green', 'Purple', 'Pink', 'Gray', 'Maroon', 'Teal', 'Olive',
+      'Lime', 'Aqua', 'Silver', 'Navy', 'Fuchsia', 'Coral', 'Indigo', 'White'],
+    sizes: ['28', '30', '32', '34', '36', '38', '40', '42'],
+    sleeves: [],
+    priceRanges: [
+      { min: 0, max: 999.99, label: '₹0.00 - ₹999.99' },
+      { min: 1000, max: 1999.99, label: '₹1000.00 - ₹1999.99' },
+      { min: 2000, max: 2999.99, label: '₹2000.00 - ₹2999.99' },
+      { min: 3000, max: 4999.99, label: '₹3000.00 - ₹4999.99' },
+    ]
+  };
+
   const {
     filteredProducts,
-    activeFilters,
-    setActiveFilters,
+    selectedColors,
+    selectedSizes,
+    selectedSleeves,
+    selectedPriceRanges,
     sortOption,
+    hoveredProduct,
     setSortOption,
+    setHoveredProduct,
+    handleColorToggle,
+    handleSizeToggle,
+    handleSleevesToggle,
+    handlePriceRangeToggle,
+    removeFilter,
     resetFilters
-  } = useProductFilters({ products: allProducts });
+  } = useProductFilters({ products: allProducts, filterOptions });
 
   const handleGoBack = () => {
     window.history.back();
   };
 
-  const priceRanges = [
-    { min: 0, max: 999.99, label: '₹0.00 - ₹999.99' },
-    { min: 1000, max: 1999.99, label: '₹1000.00 - ₹1999.99' },
-    { min: 2000, max: 2999.99, label: '₹2000.00 - ₹2999.99' },
-    { min: 3000, max: 4999.99, label: '₹3000.00 - ₹4999.99' },
+  const toggleFavorite = (productId: string) => {
+    setFavorites(prev => 
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, index) => (
+      <Star
+        key={index}
+        className={`w-3 h-3 ${
+          index < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
+        }`}
+      />
+    ));
+  };
+
+  const breadcrumbItems = [
+    { label: 'Home', onClick: () => window.location.hash = '#/' },
+    { label: 'Bottoms' },
+    { label: 'View All' }
   ];
 
   return (
@@ -59,21 +101,69 @@ const Bottoms = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Filter Sidebar */}
-          <div className="hidden md:block">
-            <ProductFilter 
-              onFilterChange={setActiveFilters}
-              activeFilters={activeFilters}
-              showSleeves={false}
-              priceRanges={priceRanges}
-            />
-          </div>
+          {/* Filters Sidebar */}
+          <ProductFilter
+            filterOptions={filterOptions}
+            selectedColors={selectedColors}
+            selectedSizes={selectedSizes}
+            selectedSleeves={selectedSleeves}
+            selectedPriceRanges={selectedPriceRanges}
+            onColorToggle={handleColorToggle}
+            onSizeToggle={handleSizeToggle}
+            onSleevesToggle={handleSleevesToggle}
+            onPriceRangeToggle={handlePriceRangeToggle}
+            onRemoveFilter={removeFilter}
+            onResetFilters={resetFilters}
+            showSleeves={false}
+          />
           
           {/* Main Content */}
           <div className="flex-1">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb items={breadcrumbItems} />
+
+            {/* Selected Filters */}
+            {(selectedColors.length > 0 || selectedSizes.length > 0 || selectedPriceRanges.length > 0) && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                {selectedColors.map(color => (
+                  <div key={`color-${color}`} className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
+                    {color}
+                    <button
+                      onClick={() => removeFilter('color', color)}
+                      className="ml-1 text-gray-500 hover:text-black"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+                {selectedSizes.map(size => (
+                  <div key={`size-${size}`} className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
+                    {size}
+                    <button
+                      onClick={() => removeFilter('size', size)}
+                      className="ml-1 text-gray-500 hover:text-black"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+                {selectedPriceRanges.map(range => (
+                  <div key={`price-${range}`} className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
+                    {range}
+                    <button
+                      onClick={() => removeFilter('price', range)}
+                      className="ml-1 text-gray-500 hover:text-black"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">BOTTOMS</h1>
-              
+
               {/* Sort Dropdown */}
               <div className="relative">
                 <select
@@ -81,26 +171,24 @@ const Bottoms = () => {
                   onChange={(e) => setSortOption(e.target.value)}
                   className="appearance-none bg-white border border-gray-300 rounded-md pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
                 >
-                  <option value="default">Sort by: Default</option>
+                  <option value="default">Sort by: Select...</option>
                   <option value="price-low-high">Price: Low to High</option>
                   <option value="price-high-low">Price: High to Low</option>
-                  <option value="newest">Newest First</option>
-                  <option value="name-a-z">Name: A to Z</option>
-                  <option value="name-z-a">Name: Z to A</option>
+                  <option value="newest">Newest Arrivals</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                   <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                   </svg>
                 </div>
               </div>
             </div>
-            
+
             {/* Product Grid */}
             {filteredProducts.length === 0 ? (
               <div className="bg-gray-100 rounded-lg p-12 text-center">
                 <p className="text-gray-500">No products match your filters</p>
-                <button 
+                <button
                   onClick={resetFilters}
                   className="mt-4 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
                 >
@@ -108,7 +196,72 @@ const Bottoms = () => {
                 </button>
               </div>
             ) : (
-              <ProductGrid products={filteredProducts} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map(product => (
+                  <div
+                    key={product._id}
+                    className="group relative"
+                    onMouseEnter={() => setHoveredProduct(product._id!)}
+                    onMouseLeave={() => setHoveredProduct(null)}
+                  >
+                    <div className="aspect-[5.5/6.5] bg-gray-100 mb-2 overflow-hidden rounded-md relative">
+                      {/* New Arrival Badge */}
+                      {product.isNewArrival && (
+                        <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                          NEW ARRIVAL
+                        </div>
+                      )}
+                      
+                      {/* Favorite Button */}
+                      <button
+                        onClick={() => toggleFavorite(product._id!)}
+                        className="absolute top-2 right-2 z-10 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        <Heart 
+                          className={`w-4 h-4 ${
+                            favorites.includes(product._id!) 
+                              ? 'text-red-500 fill-current' 
+                              : 'text-gray-600'
+                          }`} 
+                        />
+                      </button>
+
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className={`w-full h-full object-cover transition-transform duration-300 ${hoveredProduct === product._id ? 'scale-110' : 'scale-100'}`}
+                      />
+                    </div>
+                    
+                    <div className="mt-4">
+                      {/* Rating */}
+                      {product.rating && (
+                        <div className="flex items-center space-x-1 mb-2">
+                          <div className="flex items-center">
+                            {renderStars(product.rating)}
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            {product.rating} ({product.reviews || 0})
+                          </span>
+                        </div>
+                      )}
+                      
+                      <h3 className="font-medium text-lg group-hover:underline mb-1">{product.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <p className="text-gray-900 font-bold">₹{product.price.toLocaleString()}</p>
+                        {product.originalPrice && (
+                          <>
+                            <p className="text-gray-500 line-through text-sm">₹{product.originalPrice.toLocaleString()}</p>
+                            {product.discount && (
+                              <p className="text-green-600 text-sm">{product.discount}</p>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
