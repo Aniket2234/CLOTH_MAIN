@@ -6,7 +6,7 @@ import AppPromotion from './components/AppPromotion';
 import NewDealsSection from './components/NewDealsSection';
 import NewArrivalsSection from './components/NewArrivalsSection';
 import HappyCustomers from './components/HappyCustomers';
-import EmpowerSection from './components/EmpowerSection';
+import StoreLocationSection from './components/StoreLocationSection';
 import Footer from './components/Footer';
 import TShirts from './pages/TShirts';
 import Shirts from './pages/Shirts';
@@ -72,7 +72,7 @@ function App() {
             <NewDealsSection />
             <NewArrivalsSection />
             <HappyCustomers />
-            <EmpowerSection />
+            <StoreLocationSection />
             <Footer />
           </>
         );
