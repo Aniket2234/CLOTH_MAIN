@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 
 interface PriceRangeSliderProps {
   min: number;
@@ -16,15 +16,7 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
   step = 50
 }) => {
   const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null);
-  const [dragOffset, setDragOffset] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
-
-  // Sync internal state with external value changes
-  useEffect(() => {
-    if (!isDragging) {
-      // Only update when not dragging to prevent conflicts
-    }
-  }, [value, isDragging]);
 
   const getPercentage = useCallback((val: number) => {
     if (max === min) return 0;
@@ -45,7 +37,7 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
     if (!sliderRef.current) return;
 
     const rect = sliderRef.current.getBoundingClientRect();
-    const relativeX = clientX - rect.left - dragOffset;
+    const relativeX = clientX - rect.left;
     const percentage = (relativeX / rect.width) * 100;
     const rawValue = getValueFromPercentage(percentage);
     
@@ -65,20 +57,12 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
     }
 
     onChange(newRange);
-  }, [value, min, max, step, onChange, getValueFromPercentage, snapToStep, dragOffset]);
+  }, [value, min, max, step, onChange, getValueFromPercentage, snapToStep]);
 
   const handleMouseDown = (type: 'min' | 'max') => (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (!sliderRef.current) return;
-
-    const rect = sliderRef.current.getBoundingClientRect();
-    const handlePosition = getPercentage(value[type === 'min' ? 0 : 1]);
-    const handlePixelPosition = (handlePosition / 100) * rect.width;
-    const clickOffset = e.clientX - rect.left - handlePixelPosition;
-    
-    setDragOffset(clickOffset);
     setIsDragging(type);
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
@@ -89,7 +73,6 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
     const handleMouseUp = (upEvent: MouseEvent) => {
       updateValueFromPosition(upEvent.clientX, type, true); // Snap on release
       setIsDragging(null);
-      setDragOffset(0);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
       document.body.style.userSelect = '';
@@ -105,14 +88,8 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
   const handleTouchStart = (type: 'min' | 'max') => (e: React.TouchEvent) => {
     e.preventDefault();
     
-    if (!sliderRef.current || e.touches.length === 0) return;
-
-    const rect = sliderRef.current.getBoundingClientRect();
-    const handlePosition = getPercentage(value[type === 'min' ? 0 : 1]);
-    const handlePixelPosition = (handlePosition / 100) * rect.width;
-    const touchOffset = e.touches[0].clientX - rect.left - handlePixelPosition;
+    if (e.touches.length === 0) return;
     
-    setDragOffset(touchOffset);
     setIsDragging(type);
 
     const handleTouchMove = (moveEvent: TouchEvent) => {
@@ -127,7 +104,6 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
         updateValueFromPosition(endEvent.changedTouches[0].clientX, type, true); // Snap on release
       }
       setIsDragging(null);
-      setDragOffset(0);
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
     };
