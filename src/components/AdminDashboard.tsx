@@ -54,9 +54,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
   ];
 
   return (
-    <div className="flex h-full">
+    <div className="flex min-h-screen bg-white rounded-lg shadow-sm">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-50 border-r border-gray-200">
+      <div className="w-64 bg-gray-50 border-r border-gray-200 rounded-l-lg">
         <div className="p-6">
           <div className="flex items-center space-x-3 mb-8">
             <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
@@ -98,7 +98,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto rounded-r-lg">
         <div className="p-8">
           {activeTab === 'overview' && (
             <div>

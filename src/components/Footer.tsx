@@ -29,8 +29,17 @@ const Footer = () => {
   const supportInfo = [
     'support@nikzone.in',
     '+91 9876543210',
-    'Mon-Sat: 10AM-7PM'
+    'Mon-Sat: 10AM-7PM',
+    'Admin Login'
   ];
+
+  const handleSupportClick = (info: string) => {
+    if (info === 'Admin Login') {
+      // Navigate to admin page
+      window.location.hash = '#/admin';
+      window.dispatchEvent(new CustomEvent('navigate', { detail: { page: 'admin' } }));
+    }
+  };
 
   return (
     <footer className="bg-white border-t border-gray-200">
@@ -102,8 +111,17 @@ const Footer = () => {
               <h4 className="text-lg font-bold text-gray-900 mb-6">SUPPORT</h4>
               <ul className="space-y-3">
                 {supportInfo.map((info, index) => (
-                  <li key={index} className="text-gray-600">
-                    {info}
+                  <li key={index}>
+                    {info === 'Admin Login' ? (
+                      <button
+                        onClick={() => handleSupportClick(info)}
+                        className="text-blue-600 hover:text-blue-800 transition-colors duration-200 font-medium text-left"
+                      >
+                        {info}
+                      </button>
+                    ) : (
+                      <span className="text-gray-600">{info}</span>
+                    )}
                   </li>
                 ))}
               </ul>

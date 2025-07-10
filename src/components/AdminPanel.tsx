@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
@@ -12,27 +12,37 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {isAuthenticated ? 'Admin Dashboard' : 'Admin Login'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-          >
-            <X className="w-6 h-6 text-gray-600" />
-          </button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={onClose}
+                className="flex items-center space-x-2 text-gray-600 hover:text-black transition-colors duration-200"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span>Back to Website</span>
+              </button>
+            </div>
+            <h1 className="text-xl font-bold text-gray-900">
+              {isAuthenticated ? 'Admin Dashboard' : 'Admin Login'}
+            </h1>
+            <div className="w-32"></div> {/* Spacer for centering */}
+          </div>
         </div>
-        
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
-          {isAuthenticated ? (
-            <AdminDashboard onClose={onClose} />
-          ) : (
+      </div>
+      
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {isAuthenticated ? (
+          <AdminDashboard onClose={onClose} />
+        ) : (
+          <div className="max-w-md mx-auto">
             <AdminLogin />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

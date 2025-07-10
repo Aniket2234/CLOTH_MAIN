@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProductProvider } from './contexts/ProductContext';
-import AdminButton from './components/AdminButton';
 import Header from './components/Header';
+import AdminPanel from './components/AdminPanel';
 import HeroCarousel from './components/HeroCarousel';
 import CategoryCollections from './components/CategoryCollections';
 import AppPromotion from './components/AppPromotion';
@@ -65,6 +65,8 @@ function App() {
         return <Summer2025 />;
       case 'cart':
         return <Cart />;
+      case 'admin':
+        return <AdminPanel onClose={() => navigateToPage('home')} />;
       default:
         return (
           <>
@@ -85,12 +87,10 @@ function App() {
     <AuthProvider>
       <ProductProvider>
         <div className="min-h-screen flex flex-col">
-          {/* Admin Button - Fixed position, always visible */}
-          <AdminButton />
           <div className="flex-1">
             {renderPage()}
           </div>
-          <Footer />
+          {currentPage !== 'admin' && <Footer />}
           <ScrollToTop />
         </div>
       </ProductProvider>
