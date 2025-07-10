@@ -50,6 +50,8 @@ const Bottoms = () => {
     }
 
     setFilteredProducts(filtered);
+  }
+  )
 
   const handleGoBack = () => {
     window.history.back();

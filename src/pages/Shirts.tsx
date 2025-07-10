@@ -63,6 +63,8 @@ const Shirts = () => {
     }
 
     setFilteredProducts(filtered);
+  }
+  )
 
   const handleGoBack = () => {
     window.history.back();

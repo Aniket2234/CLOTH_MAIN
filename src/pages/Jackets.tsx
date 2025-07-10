@@ -50,6 +50,8 @@ const Jackets = () => {
     }
 
     setFilteredProducts(filtered);
+  }
+  )
 
   const handleGoBack = () => {
     window.history.back();

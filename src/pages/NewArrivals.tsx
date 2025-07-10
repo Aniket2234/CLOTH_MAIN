@@ -63,6 +63,8 @@ const NewArrivals = () => {
     }
 
     setFilteredProducts(filtered);
+  }
+  )
 
   const handleGoBack = () => {
     window.history.back();
