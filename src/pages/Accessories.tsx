@@ -33,7 +33,10 @@ const Accessories = () => {
     if (activeFilters.priceRanges.length > 0) {
       filtered = filtered.filter(product => {
         return activeFilters.priceRanges.some(range => {
-          const [min, max] = range.replace(/₹|,/g, '').split(' - ').map(Number);
+          const cleanRange = range.replace(/₹|,/g, '');
+          const [minStr, maxStr] = cleanRange.split(' - ');
+          const min = parseFloat(minStr);
+          const max = parseFloat(maxStr);
           return product.price >= min && product.price <= max;
         });
       });
@@ -47,7 +50,6 @@ const Accessories = () => {
     }
 
     setFilteredProducts(filtered);
-  }, [activeFilters, allProducts]);
 
   const handleGoBack = () => {
     window.history.back();
