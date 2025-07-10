@@ -11,19 +11,6 @@ const NewArrivals = () => {
   const allNewArrivals = products.filter(p => p.isNewArrival);
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  const filterOptions = {
-    colors: ['Brown', 'Blue', 'Navy Blue', 'Light Blue', 'Black', 'Orange', 'Yellow',
-      'Red', 'Green', 'Purple', 'Pink', 'Gray', 'Maroon', 'Teal', 'Olive',
-      'Lime', 'Aqua', 'Silver', 'Navy', 'Fuchsia', 'Coral', 'Indigo', 'White'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'],
-    sleeves: ['Full Sleeves', 'Half Sleeves', 'Sleeveless'],
-    priceRanges: [
-      { min: 0, max: 499.99, label: '₹0.00 - ₹499.99' },
-      { min: 500, max: 999.99, label: '₹500.00 - ₹999.99' },
-      { min: 1000, max: 1499.99, label: '₹1000.00 - ₹1499.99' },
-      { min: 1500, max: 1999.99, label: '₹1500.00 - ₹1999.99' },
-    ]
-  };
 
   const {
     filteredProducts,
@@ -31,17 +18,20 @@ const NewArrivals = () => {
     selectedSizes,
     selectedSleeves,
     selectedPriceRanges,
+    priceRange,
     sortOption,
     hoveredProduct,
+    filterOptions,
     setSortOption,
     setHoveredProduct,
     handleColorToggle,
     handleSizeToggle,
     handleSleevesToggle,
     handlePriceRangeToggle,
+    handlePriceRangeChange,
     removeFilter,
     resetFilters
-  } = useProductFilters({ products: allNewArrivals, filterOptions });
+  } = useProductFilters({ products: allNewArrivals });
 
   const handleGoBack = () => {
     window.history.back();
@@ -109,10 +99,12 @@ const NewArrivals = () => {
               selectedSizes={selectedSizes}
               selectedSleeves={selectedSleeves}
               selectedPriceRanges={selectedPriceRanges}
+              priceRange={priceRange}
               onColorToggle={handleColorToggle}
               onSizeToggle={handleSizeToggle}
               onSleevesToggle={handleSleevesToggle}
               onPriceRangeToggle={handlePriceRangeToggle}
+              onPriceRangeChange={handlePriceRangeChange}
               onRemoveFilter={removeFilter}
               onResetFilters={resetFilters}
               showSleeves={true}

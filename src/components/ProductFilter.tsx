@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, X } from 'lucide-react';
+import PriceRangeSlider from './PriceRangeSlider';
 
 interface FilterOptions {
   colors: string[];
@@ -10,6 +11,8 @@ interface FilterOptions {
     max: number;
     label: string;
   }[];
+  minPrice: number;
+  maxPrice: number;
 }
 
 interface ProductFilterProps {
@@ -18,10 +21,12 @@ interface ProductFilterProps {
   selectedSizes: string[];
   selectedSleeves: string[];
   selectedPriceRanges: string[];
+  priceRange: [number, number];
   onColorToggle: (color: string) => void;
   onSizeToggle: (size: string) => void;
   onSleevesToggle: (sleeve: string) => void;
   onPriceRangeToggle: (range: string) => void;
+  onPriceRangeChange: (range: [number, number]) => void;
   onRemoveFilter: (type: string, value: string) => void;
   onResetFilters: () => void;
   showSleeves?: boolean;
@@ -33,10 +38,12 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
   selectedSizes,
   selectedSleeves,
   selectedPriceRanges,
+  priceRange,
   onColorToggle,
   onSizeToggle,
   onSleevesToggle,
   onPriceRangeToggle,
+  onPriceRangeChange,
   onRemoveFilter,
   onResetFilters,
   showSleeves = true
@@ -182,24 +189,38 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
           </div>
         )}
 
-        {/* Price Filter with Checkboxes (supports multiple selection) */}
+        {/* Price Filter with Slider */}
         <div className="mb-6">
-          <h3 className="font-medium mb-2">PRICE</h3>
-          <div className="space-y-1">
-            {filterOptions.priceRanges.map(range => (
-              <div key={range.label} className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={`price-${range.label}`}
-                  checked={selectedPriceRanges.includes(range.label)}
-                  onChange={() => onPriceRangeToggle(range.label)}
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <label htmlFor={`price-${range.label}`} className="ml-2 text-sm text-gray-700">
-                  {range.label}
-                </label>
-              </div>
-            ))}
+          <h3 className="font-medium mb-2">PRICE RANGE</h3>
+          
+          {/* Price Range Slider */}
+          <PriceRangeSlider
+            min={filterOptions.minPrice}
+            max={filterOptions.maxPrice}
+            value={priceRange}
+            onChange={onPriceRangeChange}
+            step={100}
+          />
+          
+          {/* Predefined Price Ranges */}
+          <div className="mt-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick Select</h4>
+            <div className="space-y-1">
+              {filterOptions.priceRanges.map(range => (
+                <div key={range.label} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`price-${range.label}`}
+                    checked={selectedPriceRanges.includes(range.label)}
+                    onChange={() => onPriceRangeToggle(range.label)}
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <label htmlFor={`price-${range.label}`} className="ml-2 text-sm text-gray-700">
+                    {range.label}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

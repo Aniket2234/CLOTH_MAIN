@@ -11,19 +11,6 @@ const Jackets = () => {
   const allProducts = getProductsByCategory('jackets');
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  const filterOptions = {
-    colors: ['Brown', 'Blue', 'Navy Blue', 'Light Blue', 'Black', 'Orange', 'Yellow',
-      'Red', 'Green', 'Purple', 'Pink', 'Gray', 'Maroon', 'Teal', 'Olive',
-      'Lime', 'Aqua', 'Silver', 'Navy', 'Fuchsia', 'Coral', 'Indigo', 'White'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'],
-    sleeves: ['Full Sleeves'],
-    priceRanges: [
-      { min: 1000, max: 2999.99, label: '₹1000.00 - ₹2999.99' },
-      { min: 3000, max: 4999.99, label: '₹3000.00 - ₹4999.99' },
-      { min: 5000, max: 7999.99, label: '₹5000.00 - ₹7999.99' },
-      { min: 8000, max: 15000, label: '₹8000.00 - ₹15000.00' },
-    ]
-  };
 
   const {
     filteredProducts,
@@ -31,17 +18,20 @@ const Jackets = () => {
     selectedSizes,
     selectedSleeves,
     selectedPriceRanges,
+    priceRange,
     sortOption,
     hoveredProduct,
+    filterOptions,
     setSortOption,
     setHoveredProduct,
     handleColorToggle,
     handleSizeToggle,
     handleSleevesToggle,
     handlePriceRangeToggle,
+    handlePriceRangeChange,
     removeFilter,
     resetFilters
-  } = useProductFilters({ products: allProducts, filterOptions });
+  } = useProductFilters({ products: allProducts });
 
   const handleGoBack = () => {
     window.history.back();
@@ -108,10 +98,12 @@ const Jackets = () => {
             selectedSizes={selectedSizes}
             selectedSleeves={selectedSleeves}
             selectedPriceRanges={selectedPriceRanges}
+            priceRange={priceRange}
             onColorToggle={handleColorToggle}
             onSizeToggle={handleSizeToggle}
             onSleevesToggle={handleSleevesToggle}
             onPriceRangeToggle={handlePriceRangeToggle}
+            onPriceRangeChange={handlePriceRangeChange}
             onRemoveFilter={removeFilter}
             onResetFilters={resetFilters}
             showSleeves={true}
